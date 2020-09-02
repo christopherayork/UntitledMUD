@@ -1,10 +1,11 @@
 package UntitledMUD
 
-
+import _ "./definitions"
 
 func main() {
 	// do any other things like world loading
 	// as the scope expands, player client and server would be seperated into different applications
+	Map, ok := NewMap()
 	game := true
 	for game { game = GameLoop() }
 	// we don't want to automatically exit the program just because the game loop ended
