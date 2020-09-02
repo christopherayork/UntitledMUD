@@ -1,5 +1,7 @@
 package UntitledMUD
 
+// import "./definitions"
+
 import (
 	"bufio"
 	"os"
