@@ -1,0 +1,151 @@
+Map {
+    Region {
+        Zone {
+            Area {
+                Plot {
+                    Tile {
+                        Obj {}
+                        Mob {}
+                    }, Tile{...}
+                }, Plot{...}
+            }, Area{...}
+        }, Zone{...}
+    }, Region{...}
+}
+
+Map -> Region -> Zone -> Area -> Plot -> Tile
+Mob and Obj live within Tile
+
+Each layer is of interface type Gridded, which holds a 2D dictionary(map) with keys as dict[x] == dict
+so that dict[x][y] = child (type Tangible) all the way down to Tile, which is NOT Gridded, as it represents a singular point on the map
+
+A map generator will use a seed and algorithm to generate a map at runtime
+The first cycle wont have any saving functionality; this is meant to be a single play run for practice and educational purposes for learning Go and
+having something to show for it
+
+Basic progression of the game will include logging in, setting basic fields for a character, picking a class, entering a starting zone,
+talking to npcs, doing quests, gathering loot and gear, and fighting pve (npcs and monsters)
+
+Stats
+-----
+Health
+Strength
+Durability
+Speed
+Accuracy
+Evasion
+
+
+Quests
+------
+Accept quest from npc
+Quests are stored in a quests map(dict)
+
+type Quest struct {
+    id string
+    name string
+    requirements map[string]Goal
+    giver *Mob // this points to the person who gave the quest
+}
+
+type Goal struct {
+    type string // ie kill, gather, talk
+    current int
+    target int
+    complete bool // talk types only work off this, but it's always marked as complete if current meets target
+}
+
+
+Login
+----
+1. Create Character
+----> Fields: Name, Description, Age
+----> Class: Swordsman, Lancer, Axeman, Archer (No mages in alpha)
+--------> Swordsman: +Speed, +Accuracy, +Evasion
+--------> Lancer: +Strength, +Speed, +Accuracy
+--------> Axeman: +Health, +Strength, +Durability
+--------> Archer: +Strength, +Accuracy, +Evasion
+2. Go to starting point, help command that explains basic commands and how to play the game
+---> NPC at starting point to give you your first quest
+---> First quest is to go gather some herbs for the local apothecary; teach player how to traverse map and pickup items
+--------> Gather 2 mushroom caps, 2 pixie grass
+---> Second quest is to clear out a goblin den
+--------> Defeat 5 goblins, 3 hobgoblins, 2 kobolds, and 1 goblin veteran
+---> Third quest is to defeat the goblin count
+--------> Defeat 10 goblins, 5 hobgoblins, 4 kobolds, 3 goblin veterans, 2 goblin berserkers, and 1 goblin count
+
+---> End game
+
+
+Commands
+--------
+Say(): output some text to the area (reserved for communicating to npcs)
+Rest(): starts ticking up restorative processes; sit down and heal up over some period of time, can't perform any actions without breaking rest
+North(): [n, north] move north
+South(): [s, south] move south
+East(): [e, east] move east
+West(): [w, west] move west
+Attack(): [a <targetName>, attack <targetName>] attacks the first enemy in range that matches <targetName>, triggering them to begin fighting with the player
+Equip(): [e <equipName>, equip <equipName>] equips the designated item if possible
+Character(): [c, char, character] outputs information about the character
+Examine(): [ex <target>, examine <target>, look <target>, l <target>] displays information about the matched item/person/thing
+Optional MVP: {
+    Back(): [b, back] move backwards into the direction from which you came
+}
+
+Release Canvases
+
+0.1
+---
+Map generation: basic generator with 1 map, 1 region, 1 zone, 2 areas, 4 plots per area, and 4 tiles per plot
+
+0.2
+---
+Movement: can move around in all cardinal directions freely (NSEW)
+Display: Each time you move, the map is rendered again in a text-based grid with each room description and each tile having a specific tag to it
+
+0.3
+---
+Commands: Say, Attack, Rest, Examine, Character, Equip
+
+0.4
+---
+NPCs: Populate NPCs who say things when the player enters the local Plot
+
+0.5
+---
+Loot: Collectibles that spawn on the floor
+Types: Mushroom Caps, Pixie Grass
+
+0.6
+---
+Weapons: for each type of weapon, 1 of (Worn, Basic, Novice, Journeyman, Expert)
+Types: Sword, Lance, Axe, Bow
+
+0.7
+----
+Enemies: Populate specific zones with an array of monsters
+Types: Goblin, Hobgoblin, Kobold, Goblin Veteran, Goblin Berserker, Goblin Count
+Side: Add weapon drops to some enemies
+--> Goblin: 30% chance to drop 1 of type (Worn), 20% chance to drop 1 of type (Basic), 15% chance to drop 1 of type (Novice)
+--> Hobgoblin: 30% (Worn), 25% (Basic), 20% (Novice)
+--> Kobold: 30% (Basic), 25% (Novice), 10% (Journeyman)
+--> Goblin Veteran: 30% (Novice), 15% (Journeyman)
+--> Goblin Berserker: 30% (Novice), 25% (Journeyman), 15% (Expert)
+--> Goblin Count: 30% Journeyman, 25% (Expert)
+
+0.8
+---
+Quests: Add quests to NPCs, 3 quests in alpha
+Type: Q1, Gather herbs
+
+0.9
+---
+Quests
+Type: Q2, Kill basic enemies
+
+1.0
+---
+Quests
+Type: Q3, Kill Goblin Count
+
