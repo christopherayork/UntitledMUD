@@ -8,15 +8,18 @@ type Map struct {
 	name string
 }
 
-func (m Map) Enter(target *Tangible) bool {
-	return true
+func (m Map) Enter(target interface{}, x, y int) bool {
+	if tan, ok := target.(Region); ok {
+		gridSuccess := m.grid.Enter(tan, x, y)
+		return gridSuccess
+	} else { return false }
 }
 
 func (m Map) Entered(target *Tangible) {
 
 }
 
-func (m Map) Exit(target *Tangible) bool {
+func (m Map) Exit(target *Tangible, x, y int) bool {
 	return true
 }
 

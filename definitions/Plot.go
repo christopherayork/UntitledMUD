@@ -17,19 +17,22 @@ func NewPlot(g Gridded) (*Plot, error) {
 	}
 	plot := Plot{}
 	plot.grid = NewGrid(plot)
-	plot.loc = &g
+	plot.loc = g
 	return &plot, nil
 }
 
-func (p Plot) Enter(target *Tangible) bool {
-	return true
+func (p Plot) Enter(target interface{}, x, y int) bool {
+	if val, ok := target.(Tile); ok {
+		gridSuccess := p.grid.Enter(&val, x, y)
+		return gridSuccess
+	} else { return false }
 }
 
 func (p Plot) Entered(target *Tangible) {
 
 }
 
-func (p Plot) Exit(target *Tangible) bool {
+func (p Plot) Exit(target *Tangible, x, y int) bool {
 	return true
 }
 

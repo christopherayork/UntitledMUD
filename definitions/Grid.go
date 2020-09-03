@@ -11,18 +11,20 @@ func NewGrid(p interface{}) *Grid {
 	} else { return &Grid{} }
 }
 
-func (g Grid) Enter(target *Tangible, x int, y int) bool {
+func (g Grid) Enter(target interface{}, x int, y int) bool {
 	success := false
 	if _, ok := g.grid[string(x)]; !ok {
 		g.grid[string(x)] = make(map[string]*Tangible)
 	}
-	g.grid[string(x)][string(y)] = target
-	target.loc = g.parent
-	target.x = x
-	target.y = y
-	success = true
-	defer g.Entered(target)
-	return success
+	if tan, ok2 := target.(Tangible); ok2 {
+		g.grid[string(x)][string(y)] = &tan
+		tan.loc = *g.parent
+		tan.x = x
+		tan.y = y
+		success = true
+		defer g.Entered(&tan)
+		return success
+	} else { return false }
 }
 
 func (g Grid) Entered(target *Tangible) {

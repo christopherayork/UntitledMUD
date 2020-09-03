@@ -7,19 +7,27 @@ type Tangible struct {
 	durability Stat
 	description string
 	contents []*Tangible
-	loc *Gridded
+	loc Gridded
 	x int
 	y int
 }
 
 type Gridded interface {
-	Enter(target *Tangible) bool
+	Enter(target interface{}, x, y int) bool
 	Entered(target *Tangible)
-	Exit(target *Tangible) bool
+	Exit(target *Tangible, x, y int) bool
 	Exited(target *Tangible)
 }
 
-func (t Tangible) Enter(target *Tangible) bool {
+type Display interface {
+	String()
+}
+
+func (t Tangible) String() string {
+	return t.description
+}
+
+func (t Tangible) Enter(target *Tangible, x, y int) bool {
 	// define some rules for movement procedures
 	// this will check if movement is permitted into this tangible
 	return false // lets just say false for now
@@ -31,7 +39,7 @@ func (t Tangible) Entered(target *Tangible) {
 	// this will return nothing as of now
 }
 
-func (t Tangible) Exit(target *Tangible) bool {
+func (t Tangible) Exit(target *Tangible, x, y int) bool {
 	// called to permit exiting
 	return false // no allowance for now
 }

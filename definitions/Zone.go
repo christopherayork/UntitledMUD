@@ -14,20 +14,22 @@ func NewZone(p Gridded) (*Zone, error) {
 	}
 	zone := Zone{}
 	zone.grid = NewGrid(&zone)
-	zone.loc = &p
+	zone.loc = p
 	return &zone, nil
 }
 
-func (z Zone) Enter(target *Tangible) bool {
-
-	return true
+func (z Zone) Enter(target interface{}, x, y int) bool {
+	if tan, ok := target.(Area); ok {
+		gridSuccess := z.grid.Enter(tan, x, y)
+		return gridSuccess
+	} else { return false }
 }
 
 func (z Zone) Entered(target *Tangible) {
 
 }
 
-func (z Zone) Exit(target *Tangible) bool {
+func (z Zone) Exit(target *Tangible, x, y int) bool {
 	return true
 }
 
