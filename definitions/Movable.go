@@ -2,12 +2,15 @@ package definitions
 
 type Movable struct {
 	Tangible
+	health Stat
+	durability Stat
 }
 
-type Obj struct {
-	Movable
+func (m Movable) Move(dir string) bool {
+
+	return true // we'll figure this out later!
 }
 
-type Mob struct {
-	Movable
+type Individual interface {
+	Move(dir string) bool
 }

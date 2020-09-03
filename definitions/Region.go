@@ -17,22 +17,23 @@ func NewRegion(m Gridded) (*Region, error) {
 	return &region, nil
 }
 
-func (r Region) Enter(target interface{}, x, y int) bool {
+func (r Region) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Zone); ok {
 		gridSuccess := r.grid.Enter(tan, x, y)
+		if gridSuccess { defer r.Entered(tan) }
 		return gridSuccess
 	} else { return false }
 }
 
-func (r Region) Entered(target *Tangible) {
+func (r Region) Entered(target Display) {
 
 }
 
-func (r Region) Exit(target *Tangible, x, y int) bool {
+func (r Region) Exit(target Display, x, y int) bool {
 
 	return true
 }
 
-func (r Region) Exited(target *Tangible) {
+func (r Region) Exited(target Display) {
 
 }

@@ -8,22 +8,22 @@ type Map struct {
 	name string
 }
 
-func (m Map) Enter(target interface{}, x, y int) bool {
+func (m Map) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Region); ok {
 		gridSuccess := m.grid.Enter(tan, x, y)
 		return gridSuccess
 	} else { return false }
 }
 
-func (m Map) Entered(target *Tangible) {
+func (m Map) Entered(target Display) {
 
 }
 
-func (m Map) Exit(target *Tangible, x, y int) bool {
+func (m Map) Exit(target Display, x, y int) bool {
 	return true
 }
 
-func (m Map) Exited(target *Tangible) {
+func (m Map) Exited(target Display) {
 
 }
 

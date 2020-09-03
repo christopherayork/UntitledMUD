@@ -3,8 +3,6 @@ package definitions
 
 type Tangible struct {
 	name string
-	health Stat
-	durability Stat
 	description string
 	contents []*Tangible
 	loc Gridded
@@ -13,38 +11,38 @@ type Tangible struct {
 }
 
 type Gridded interface {
-	Enter(target interface{}, x, y int) bool
-	Entered(target *Tangible)
-	Exit(target *Tangible, x, y int) bool
-	Exited(target *Tangible)
+	Enter(target Display, x, y int) bool
+	Entered(target Display)
+	Exit(target Display, x, y int) bool
+	Exited(target Display)
 }
 
 type Display interface {
-	String()
+	String() string
 }
 
 func (t Tangible) String() string {
 	return t.description
 }
 
-func (t Tangible) Enter(target *Tangible, x, y int) bool {
+func (t Tangible) Enter(target Display, x, y int) bool {
 	// define some rules for movement procedures
 	// this will check if movement is permitted into this tangible
-	return false // lets just say false for now
+	return true
 }
 
 
-func (t Tangible) Entered(target *Tangible) {
+func (t Tangible) Entered(target Display) {
 	// if Enter() is validated as truthy, this will be called to complete the process and add addition room for behavior
 	// this will return nothing as of now
 }
 
-func (t Tangible) Exit(target *Tangible, x, y int) bool {
+func (t Tangible) Exit(target Display, x, y int) bool {
 	// called to permit exiting
 	return false // no allowance for now
 }
 
-func (t Tangible) Exited(target *Tangible) {
+func (t Tangible) Exited(target Display) {
 	// called on confirmation of Exit() and to complete the process plus add room for additional behavior
 
 }

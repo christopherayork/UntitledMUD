@@ -21,21 +21,22 @@ func NewPlot(g Gridded) (*Plot, error) {
 	return &plot, nil
 }
 
-func (p Plot) Enter(target interface{}, x, y int) bool {
-	if val, ok := target.(Tile); ok {
-		gridSuccess := p.grid.Enter(&val, x, y)
+func (p Plot) Enter(target Display, x, y int) bool {
+	if tan, ok := target.(Tile); ok {
+		gridSuccess := p.grid.Enter(&tan, x, y)
+		if gridSuccess { defer p.Entered(tan) }
 		return gridSuccess
 	} else { return false }
 }
 
-func (p Plot) Entered(target *Tangible) {
+func (p Plot) Entered(target Display) {
 
 }
 
-func (p Plot) Exit(target *Tangible, x, y int) bool {
+func (p Plot) Exit(target Display, x, y int) bool {
 	return true
 }
 
-func (p Plot) Exited(target *Tangible) {
+func (p Plot) Exited(target Display) {
 
 }
