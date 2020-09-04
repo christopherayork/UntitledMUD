@@ -4,7 +4,7 @@ package definitions
 type Tangible struct {
 	name string
 	description string
-	contents []*Tangible
+	contents []*Individual
 	loc Gridded
 	x int
 	y int
