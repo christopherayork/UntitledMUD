@@ -22,11 +22,14 @@ func (r Region) Enter(target Display, x, y int) bool {
 		gridSuccess := r.grid.Enter(tan, x, y)
 		if gridSuccess { defer r.Entered(tan) }
 		return gridSuccess
-	} else { return false }
+	}
+	return false
 }
 
 func (r Region) Entered(target Display) {
-
+	if _, ok := target.(Individual); ok{
+		r.Apply(target)
+	}
 }
 
 func (r Region) Exit(target Display, x, y int) bool {

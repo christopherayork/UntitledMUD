@@ -2,6 +2,15 @@ package definitions
 
 import "errors"
 
+/*
+String this together so that when an Individual enters a Tile, if the Tile isn't within the same Plot that the Tile it left was in
+Plot.Enter() gets run on the Individual.
+This goes all the way up the chain so that If the player Exits a plot and Enters a new one with a different Area, Area.Enter()
+Is called on the Individual.
+If they leave an Area and enter a new one that isn't of the same Zone, Zone.Enter() gets called on the individual
+Leaving a Zone and entering a new one in a different Region calls Region.Enter() on the individual as well.
+ */
+
 type Tile struct {
 	Tangible
 }
@@ -62,6 +71,9 @@ func (t Tile) Enter(target Individual) bool {
 func (t Tile) Entered(target Individual) {
 	// we currently have no overloading to add to the process with this
 	// it's merely a placeholder for additional effects in future release canvases
+	if d, ok := target.(Display); ok {
+		t.Apply(d)
+	}
 }
 
 func (t Tile) Exit(target Individual) bool {

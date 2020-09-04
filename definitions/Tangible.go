@@ -1,5 +1,6 @@
 package definitions
 
+import "fmt"
 
 type Tangible struct {
 	name string
@@ -19,6 +20,11 @@ type Gridded interface {
 
 type Display interface {
 	String() string
+}
+
+func (t Tangible) Apply(target Display) {
+	fmt.Println(t.String())
+	// probably want to format this better later and make it more immersive
 }
 
 func (t Tangible) String() string {

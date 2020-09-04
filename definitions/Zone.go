@@ -23,11 +23,14 @@ func (z Zone) Enter(target Display, x, y int) bool {
 		gridSuccess := z.grid.Enter(tan, x, y)
 		if gridSuccess { defer z.Entered(tan) }
 		return gridSuccess
-	} else { return false }
+	}
+	return false
 }
 
 func (z Zone) Entered(target Display) {
-
+	if _, ok := target.(Individual); ok{
+		z.Apply(target)
+	}
 }
 
 func (z Zone) Exit(target Display, x, y int) bool {
