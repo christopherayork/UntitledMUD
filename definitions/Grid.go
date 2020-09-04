@@ -11,6 +11,15 @@ func NewGrid(p interface{}) *Grid {
 	} else { return &Grid{} }
 }
 
+func (g Grid) GetValue(x, y int) *Tangible {
+	if v, ok := g.grid[string(x)]; ok {
+		if v2, ok2 := v[string(y)]; ok2 {
+			return v2
+		}
+	}
+	return nil
+}
+
 func (g Grid) Enter(target interface{}, x int, y int) bool {
 	success := false
 	if _, ok := g.grid[string(x)]; !ok {

@@ -9,18 +9,48 @@ import "errors"
 type Plot struct {
 	Tangible
 	grid *Grid
+	north *Plot
+	south *Plot
+	east *Plot
+	west *Plot
 }
 
 // func (t Tangible) Apply(target Display) {}
 
-func NewPlot(g Gridded) (*Plot, error) {
+func NewPlot(g Gridded, dirs ...map[string]*Plot) (*Plot, error) {
 	if _, ok := g.(Area); !ok {
 		return &Plot{}, errors.New("error: NewPlot(), argument for parameter g must be of type Area")
 	}
 	plot := Plot{}
 	plot.grid = NewGrid(plot)
 	plot.loc = g
+	for i := range dirs {
+		if i > 0 { break }
+		if v, ok := dirs[i]["n"]; ok { plot.north = v }
+		if v, ok := dirs[i]["s"]; ok { plot.south = v }
+		if v, ok := dirs[i]["e"]; ok { plot.east = v }
+		if v, ok := dirs[i]["w"]; ok { plot.west = v }
+	}
 	return &plot, nil
+}
+
+func (t Plot) SetDirection(d string, v *Plot) bool {
+	switch d {
+		case "n":
+			t.north = v
+			v.south = &t // doubly linked
+		case "s":
+			t.south = v
+			v.north = &t
+		case "e":
+			t.east = v
+			v.west = &t
+		case "w":
+			t.west = v
+			v.east = &t
+		default: return false
+	}
+	return true
 }
 
 func (p Plot) Enter(target Display, x, y int) bool {

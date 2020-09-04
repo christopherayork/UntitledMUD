@@ -5,16 +5,46 @@ import "errors"
 type Region struct {
 	Tangible
 	grid *Grid
+	north *Region
+	south *Region
+	east *Region
+	west *Region
 }
 
-func NewRegion(m Gridded) (*Region, error) {
+func NewRegion(m Gridded, dirs ...map[string]*Region) (*Region, error) {
 	if _, ok := m.(Map); !ok {
 		return &Region{}, errors.New("error: NewRegion(), argument m required to be of type *Map")
 	}
 	region := Region{}
 	region.grid = NewGrid(&region)
 	region.loc = m
+	for i := range dirs {
+		if i > 0 { break }
+		if v, ok := dirs[i]["n"]; ok { region.north = v }
+		if v, ok := dirs[i]["s"]; ok { region.south = v }
+		if v, ok := dirs[i]["e"]; ok { region.east = v }
+		if v, ok := dirs[i]["w"]; ok { region.west = v }
+	}
 	return &region, nil
+}
+
+func (t Region) SetDirection(d string, v *Region) bool {
+	switch d {
+		case "n":
+			t.north = v
+			v.south = &t // doubly linked
+		case "s":
+			t.south = v
+			v.north = &t
+		case "e":
+			t.east = v
+			v.west = &t
+		case "w":
+			t.west = v
+			v.east = &t
+		default: return false
+	}
+	return true
 }
 
 func (r Region) Enter(target Display, x, y int) bool {

@@ -68,10 +68,18 @@ func removeInd(inds []*Individual, ind *Individual) (bool, []*Individual) {
 
 func (t Tile) SetDirection(d string, v *Tile) bool {
 	switch d {
-		case "n": t.north = v
-		case "s": t.south = v
-		case "e": t.east = v
-		case "w": t.west = v
+		case "n":
+			t.north = v
+			v.south = &t // doubly linked
+		case "s":
+			t.south = v
+			v.north = &t
+		case "e":
+			t.east = v
+			v.west = &t
+		case "w":
+			t.west = v
+			v.east = &t
 		default: return false
 	}
 	return true
