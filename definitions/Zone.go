@@ -11,20 +11,21 @@ type Zone struct {
 	west *Zone
 }
 
-func NewZone(p Gridded, dirs ...map[string]*Zone) (*Zone, error) {
-	_, ok := p.(Region)
+func NewZone(g Gridded, x, y int, dirs ...map[string]*Zone) (*Zone, error) {
+	_, ok := g.(Region)
 	if !ok {
 		return &Zone{}, errors.New("error: NewZone(), type Zone requires parameter p of type Region")
 	}
 	zone := Zone{}
 	zone.grid = NewGrid(&zone)
-	zone.loc = p
+	zone.loc = g
+	g.Enter(zone, x, y)
 	for i := range dirs {
 		if i > 0 { break }
-		if v, ok := dirs[i]["n"]; ok { zone.north = v }
-		if v, ok := dirs[i]["s"]; ok { zone.south = v }
-		if v, ok := dirs[i]["e"]; ok { zone.east = v }
-		if v, ok := dirs[i]["w"]; ok { zone.west = v }
+		if v, ok := dirs[i]["n"]; ok { zone.SetDirection("n", v) }
+		if v, ok := dirs[i]["s"]; ok { zone.SetDirection("s", v) }
+		if v, ok := dirs[i]["e"]; ok { zone.SetDirection("e", v) }
+		if v, ok := dirs[i]["w"]; ok { zone.SetDirection("w", v) }
 	}
 	return &zone, nil
 }

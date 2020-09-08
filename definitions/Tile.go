@@ -31,10 +31,10 @@ func NewTile(g Gridded, x, y int, dirs ...map[string]*Tile) (*Tile, error) {
 		tile.loc = tan
 		for i := range dirs {
 			if i > 0 { break }
-			if v, ok := dirs[i]["n"]; ok { tile.north = v }
-			if v, ok := dirs[i]["s"]; ok { tile.south = v }
-			if v, ok := dirs[i]["e"]; ok { tile.east = v }
-			if v, ok := dirs[i]["w"]; ok { tile.west = v }
+			if v, ok := dirs[i]["n"]; ok { tile.SetDirection("n", v) }
+			if v, ok := dirs[i]["s"]; ok { tile.SetDirection("s", v) }
+			if v, ok := dirs[i]["e"]; ok { tile.SetDirection("e", v) }
+			if v, ok := dirs[i]["w"]; ok { tile.SetDirection("w", v) }
 		}
 		return &tile, nil
 	} else {
@@ -91,6 +91,8 @@ func (t Tile) Enter(target Individual) bool {
 	exists := containsInd(t.contents, &target)
 	if exists { return true
 	} else {
+		parentPerms := t.loc.Enter(target, t.x, t.y)
+		if !parentPerms { return false }
 		t.contents = append(t.contents, &target)
 		defer t.Entered(target)
 		return true

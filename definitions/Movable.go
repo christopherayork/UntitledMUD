@@ -28,4 +28,5 @@ func (m Movable) Move(dir string) bool {
 
 type Individual interface {
 	Move(dir string) bool
+	String() string
 }

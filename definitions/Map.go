@@ -32,7 +32,6 @@ var maps = 0
 func NewMap() (*Map, error) {
 	maps++
 	m := Map{name: fmt.Sprintf("Map%v", maps)}
-	grid := NewGrid(&m)
-	m.grid = grid
+	m.grid = NewGrid(&m)
 	return &m, nil
 }

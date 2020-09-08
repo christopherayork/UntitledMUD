@@ -3,7 +3,6 @@ package definitions
 
 import "errors"
 
-
 // smallest grid available
 // add extra handlers to support adding tiles to it's grid
 type Plot struct {
@@ -17,19 +16,20 @@ type Plot struct {
 
 // func (t Tangible) Apply(target Display) {}
 
-func NewPlot(g Gridded, dirs ...map[string]*Plot) (*Plot, error) {
+func NewPlot(g Gridded, x, y int, dirs ...map[string]*Plot) (*Plot, error) {
 	if _, ok := g.(Area); !ok {
 		return &Plot{}, errors.New("error: NewPlot(), argument for parameter g must be of type Area")
 	}
 	plot := Plot{}
 	plot.grid = NewGrid(plot)
 	plot.loc = g
+	g.Enter(plot, x, y)
 	for i := range dirs {
 		if i > 0 { break }
-		if v, ok := dirs[i]["n"]; ok { plot.north = v }
-		if v, ok := dirs[i]["s"]; ok { plot.south = v }
-		if v, ok := dirs[i]["e"]; ok { plot.east = v }
-		if v, ok := dirs[i]["w"]; ok { plot.west = v }
+		if v, ok := dirs[i]["n"]; ok { plot.SetDirection("n", v) }
+		if v, ok := dirs[i]["s"]; ok { plot.SetDirection("s", v) }
+		if v, ok := dirs[i]["e"]; ok { plot.SetDirection("e", v) }
+		if v, ok := dirs[i]["w"]; ok { plot.SetDirection("w", v) }
 	}
 	return &plot, nil
 }
@@ -59,9 +59,13 @@ func (p Plot) Enter(target Display, x, y int) bool {
 		if gridSuccess { defer p.Entered(tan) }
 		return gridSuccess
 	}
+	if ind, ok := target.(Individual); ok {
+		// output description to target
+		p.Apply(ind)
+		return true
+		// currently this only outputs messages from the Plot, and doesn't go up the chain. We'll add that later.
+	}
 	return false
-	// add additional clauses to allow for this to be called on Individuals for the purpose of entering rooms
-	// and having more centric messages or effects be sent/applied to them
 }
 
 func (p Plot) Entered(target Display) {

@@ -11,19 +11,20 @@ type Area struct {
 	west *Area
 }
 
-func NewArea(g Gridded, dirs ...map[string]*Area) (*Area, error) {
+func NewArea(g Gridded, x, y int, dirs ...map[string]*Area) (*Area, error) {
 	if _, ok := g.(Zone); !ok {
 		return &Area{}, errors.New("error: NewArea(), argument for parameter g must be of type Zone")
 	}
 	area := Area{}
 	area.grid = NewGrid(area)
 	area.loc = g
+	g.Enter(area, x, y)
 	for i := range dirs {
 		if i > 0 { break }
-		if v, ok := dirs[i]["n"]; ok { area.north = v }
-		if v, ok := dirs[i]["s"]; ok { area.south = v }
-		if v, ok := dirs[i]["e"]; ok { area.east = v }
-		if v, ok := dirs[i]["w"]; ok { area.west = v }
+		if v, ok := dirs[i]["n"]; ok { area.SetDirection("n", v) }
+		if v, ok := dirs[i]["s"]; ok { area.SetDirection("s", v) }
+		if v, ok := dirs[i]["e"]; ok { area.SetDirection("e", v) }
+		if v, ok := dirs[i]["w"]; ok { area.SetDirection("w", v) }
 	}
 	return &area, nil
 }

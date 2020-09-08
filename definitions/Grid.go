@@ -5,6 +5,9 @@ type Grid struct {
 	parent *Gridded
 }
 
+
+// make a function to link all tangibles
+
 func NewGrid(p interface{}) *Grid {
 	if val, ok := p.(Gridded); ok {
 		return &Grid{grid: make(map[string]map[string]*Tangible), parent: &val}

@@ -1,0 +1,58 @@
+{
+	"1,1": {
+		"1,1": {
+			"1,1": {
+				"1,1": {
+					"1,1": {"Name": "Bramblesteppe Village - Blacksmith", "Description": "The smell of tempered metals and freshly coated leathers fill the room, the shopkeeper stands at the counter, eyeing you."},
+					"1,2": {"Name": "Bramblesteppe Village - Adventurer's Guild", "Description": "All sorts of adventurers fill the room, going over contracts and forming groups to complete them with. A contract clerk stands at the counter, awaiting you to approach and request work."},
+					"2,1": {"Name": "Bramblesteppe Village - Training Grounds", "Description": "All manner of training equipment stands upon the field, ready to be used. Everything here appears worn, having seen significant use."},
+					"2,2": {"Name": "Bramblesteppe Village - Square", "Description": "Children run about the stalls, and rookie adventurers barter with merchants. The stalls are arranged into a square, with seating in the center."}
+				},
+				"1,2": {
+					"1,1": {"Name": "TName", "Description": "TDescription"},
+					"1,2": {"Name": "TName", "Description": "TDescription"},
+					"2,1": {"Name": "TName", "Description": "TDescription"},
+					"2,2": {"Name": "TName", "Description": "TDescription"}
+				},
+				"2,1": {
+					"1,1": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
+					"1,2": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
+					"2,1": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
+					"2,2": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."}
+				},
+				"2,2": {
+					"1,1": {"Name": "Grasslands", "Description": "TDescription"},
+					"1,2": {"Name": "Forest", "Description": "TDescription"},
+					"2,1": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
+					"2,2": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."}
+				}
+			},
+			"1,2": {
+				"1,1": {
+					"1,1": {"Name": "TName", "Description": "TDescription"},
+					"1,2": {"Name": "TName", "Description": "TDescription"},
+					"2,1": {"Name": "TName", "Description": "TDescription"},
+					"2,2": {"Name": "TName", "Description": "TDescription"}
+				},
+				"1,2": {
+					"1,1": {"Name": "TName", "Description": "TDescription"},
+					"1,2": {"Name": "TName", "Description": "TDescription"},
+					"2,1": {"Name": "TName", "Description": "TDescription"},
+					"2,2": {"Name": "TName", "Description": "TDescription"}
+				},
+				"2,1": {
+					"1,1": {"Name": "TName", "Description": "TDescription"},
+					"1,2": {"Name": "TName", "Description": "TDescription"},
+					"2,1": {"Name": "TName", "Description": "TDescription"},
+					"2,2": {"Name": "TName", "Description": "TDescription"}
+				},
+				"2,2": {
+					"1,1": {"Name": "TName", "Description": "TDescription"},
+					"1,2": {"Name": "TName", "Description": "TDescription"},
+					"2,1": {"Name": "TName", "Description": "TDescription"},
+					"2,2": {"Name": "TName", "Description": "TDescription"}
+				}
+			}
+		}
+	}
+}

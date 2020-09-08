@@ -11,19 +11,20 @@ type Region struct {
 	west *Region
 }
 
-func NewRegion(m Gridded, dirs ...map[string]*Region) (*Region, error) {
+func NewRegion(m Gridded, x, y int, dirs ...map[string]*Region) (*Region, error) {
 	if _, ok := m.(Map); !ok {
 		return &Region{}, errors.New("error: NewRegion(), argument m required to be of type *Map")
 	}
 	region := Region{}
 	region.grid = NewGrid(&region)
 	region.loc = m
+	m.Enter(region, x, y)
 	for i := range dirs {
 		if i > 0 { break }
-		if v, ok := dirs[i]["n"]; ok { region.north = v }
-		if v, ok := dirs[i]["s"]; ok { region.south = v }
-		if v, ok := dirs[i]["e"]; ok { region.east = v }
-		if v, ok := dirs[i]["w"]; ok { region.west = v }
+		if v, ok := dirs[i]["n"]; ok { region.SetDirection("n", v) }
+		if v, ok := dirs[i]["s"]; ok { region.SetDirection("s", v) }
+		if v, ok := dirs[i]["e"]; ok { region.SetDirection("e", v) }
+		if v, ok := dirs[i]["w"]; ok { region.SetDirection("w", v) }
 	}
 	return &region, nil
 }
