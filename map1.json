@@ -1,56 +1,70 @@
 {
-	"1,1": {
+	"legend": {
+		"1": {"Name": "Bramblesteppe Village - Blacksmith", "Description": "The smell of tempered metals and freshly coated leathers fill the room, the shopkeeper stands at the counter, eyeing you."},
+		"2": {"Name": "Bramblesteppe Village - Adventurer's Guild", "Description": "All sorts of adventurers fill the room, going over contracts and forming groups to complete them with. A contract clerk stands at the counter, awaiting you to approach and request work."},
+		"3": {"Name": "Bramblesteppe Village - Training Grounds", "Description": "All manner of training equipment stands upon the field, ready to be used. Everything here appears worn, having seen significant use."},
+		"4": {"Name": "Bramblesteppe Village - Square", "Description": "Children run about the stalls, and rookie adventurers barter with merchants. The stalls are arranged into a square, with seating in the center."},
+		"5": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
+		"6": {"Name": "Grasslands", "Description": "Rolling waves of grass act as dancers to the whims of the wind, bright beams of sun shines from betwixt puffs of white cloud, painting a vividly cheery sight of outdoor enjoyment."},
+		"7": {"Name": "Forest", "Description": "Densely populated with pine and willow, this forest appears to be a soothingly calm cover for both adventurer and beast alike. Soft rays filtrate through branch and foliage, painting a serene picture."},
+		"8": {"Name": "Mt Drakkenspire - Cavern", "Description": "Dark and dreary, faint sounds of hissing and thumping can be heard echoing along the walls of the ancient caverns. The smells of nearby Goblins is nearly enough to induce asphyxiation."},
+		"9": {"Name": "Mt Drakkenspire - Sulphuric Crown", "Description": "The stench of goblin-kind grows overwhelmingly strong. Whimpers of servants taking their lashings can be heard in the distance, and an ominous presence looms just beyond."},
+		"10": {"Name": "Mt Drakkenspire - Throne Room", "Description": "Just beyond jagged stalagmites and staggered pillars stands an opening lit by ill-gotten means. Upon a bone-crafted throne sits an ugly sight, the king of the Drakkenspire Goblins."}
+	}
+	"map": {
 		"1,1": {
 			"1,1": {
 				"1,1": {
-					"1,1": {"Name": "Bramblesteppe Village - Blacksmith", "Description": "The smell of tempered metals and freshly coated leathers fill the room, the shopkeeper stands at the counter, eyeing you."},
-					"1,2": {"Name": "Bramblesteppe Village - Adventurer's Guild", "Description": "All sorts of adventurers fill the room, going over contracts and forming groups to complete them with. A contract clerk stands at the counter, awaiting you to approach and request work."},
-					"2,1": {"Name": "Bramblesteppe Village - Training Grounds", "Description": "All manner of training equipment stands upon the field, ready to be used. Everything here appears worn, having seen significant use."},
-					"2,2": {"Name": "Bramblesteppe Village - Square", "Description": "Children run about the stalls, and rookie adventurers barter with merchants. The stalls are arranged into a square, with seating in the center."}
+					"1,1": {
+						"1,1": "1",
+						"2,1": "2",
+						"1,2": "3",
+						"2,2": "4"
+					},
+					"1,2": {
+						"1,3": "5",
+						"1,4": "5",
+						"2,3": "5",
+						"2,4": "5"
+					},
+					"2,1": {
+						"3,1": "6",
+						"3,2": "6",
+						"4,1": "7",
+						"4,2": "7"
+					},
+					"2,2": {
+						"3,3": "6",
+						"3,4": "5",
+						"4,3": "7",
+						"4,4": "5"
+					}
 				},
 				"1,2": {
-					"1,1": {"Name": "TName", "Description": "TDescription"},
-					"1,2": {"Name": "TName", "Description": "TDescription"},
-					"2,1": {"Name": "TName", "Description": "TDescription"},
-					"2,2": {"Name": "TName", "Description": "TDescription"}
-				},
-				"2,1": {
-					"1,1": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
-					"1,2": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
-					"2,1": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
-					"2,2": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."}
-				},
-				"2,2": {
-					"1,1": {"Name": "Grasslands", "Description": "TDescription"},
-					"1,2": {"Name": "Forest", "Description": "TDescription"},
-					"2,1": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."},
-					"2,2": {"Name": "Mt. Drakkenspire - Foot", "Description": "A glum, craggy landscape poised beneath an ominous, looming mountain."}
-				}
-			},
-			"1,2": {
-				"1,1": {
-					"1,1": {"Name": "TName", "Description": "TDescription"},
-					"1,2": {"Name": "TName", "Description": "TDescription"},
-					"2,1": {"Name": "TName", "Description": "TDescription"},
-					"2,2": {"Name": "TName", "Description": "TDescription"}
-				},
-				"1,2": {
-					"1,1": {"Name": "TName", "Description": "TDescription"},
-					"1,2": {"Name": "TName", "Description": "TDescription"},
-					"2,1": {"Name": "TName", "Description": "TDescription"},
-					"2,2": {"Name": "TName", "Description": "TDescription"}
-				},
-				"2,1": {
-					"1,1": {"Name": "TName", "Description": "TDescription"},
-					"1,2": {"Name": "TName", "Description": "TDescription"},
-					"2,1": {"Name": "TName", "Description": "TDescription"},
-					"2,2": {"Name": "TName", "Description": "TDescription"}
-				},
-				"2,2": {
-					"1,1": {"Name": "TName", "Description": "TDescription"},
-					"1,2": {"Name": "TName", "Description": "TDescription"},
-					"2,1": {"Name": "TName", "Description": "TDescription"},
-					"2,2": {"Name": "TName", "Description": "TDescription"}
+					"3,1": {
+						"5,1": "8",
+						"5,2": "8",
+						"6,1": "8",
+						"6,2": "8"
+					},
+					"3,2": {
+						"7,1": "8",
+						"7,2": "8",
+						"8,1": "8",
+						"8,2": "8"
+					},
+					"4,1": {
+						"5,3": "8",
+						"5,4": "8",
+						"6,3": "8",
+						"6,4": "8"
+					},
+					"4,2": {
+						"7,3": "9",
+						"7,4": "9",
+						"8,3": "9",
+						"8,4": "10"
+					}
 				}
 			}
 		}

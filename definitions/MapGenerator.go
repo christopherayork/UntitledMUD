@@ -33,13 +33,16 @@ func (m MapGenerator) Generate() (*Map, bool) {
 		}
 	} // plots created, now lets make tiles
 	// very simple square algorithm
+	tx, ty := 1,1
 	for _, v := range plots {
 		for _, v2 := range v {
-			for x := 1; x < 3; x++ {
-				for y := 1; y < 3; y++ {
+			for x := tx; x < tx+2; x++ {
+				for y := ty; y < ty+2; y++ {
 					Tile, _ := NewTile(v2, x, y)
 					Tile.description = "Boop"
+					ty++
 				}
+				tx++
 			}
 		}
 	}
