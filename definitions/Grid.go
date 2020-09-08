@@ -1,4 +1,5 @@
 package definitions
+import "strconv"
 
 type Grid struct {
 	grid map[string]map[string]*Tangible
@@ -15,8 +16,8 @@ func NewGrid(p interface{}) *Grid {
 }
 
 func (g Grid) GetValue(x, y int) *Tangible {
-	if v, ok := g.grid[string(x)]; ok {
-		if v2, ok2 := v[string(y)]; ok2 {
+	if v, ok := g.grid[strconv.Itoa(x)]; ok {
+		if v2, ok2 := v[strconv.Itoa(y)]; ok2 {
 			return v2
 		}
 	}
@@ -25,11 +26,11 @@ func (g Grid) GetValue(x, y int) *Tangible {
 
 func (g Grid) Enter(target interface{}, x int, y int) bool {
 	success := false
-	if _, ok := g.grid[string(x)]; !ok {
-		g.grid[string(x)] = make(map[string]*Tangible)
+	if _, ok := g.grid[strconv.Itoa(x)]; !ok {
+		g.grid[strconv.Itoa(x)] = make(map[string]*Tangible)
 	}
 	if tan, ok2 := target.(Tangible); ok2 {
-		g.grid[string(x)][string(y)] = &tan
+		g.grid[strconv.Itoa(x)][strconv.Itoa(y)] = &tan
 		tan.loc = *g.parent
 		tan.x = x
 		tan.y = y
@@ -45,9 +46,9 @@ func (g Grid) Entered(target *Tangible) {
 
 func (g Grid) Exit(target *Tangible) bool {
 	success := false
-	if _, ok := g.grid[string(target.x)]; ok {
-		if _, ok2 := g.grid[string(target.x)][string(target.y)]; ok2 {
-			g.grid[string(target.x)][string(target.y)] = nil
+	if _, ok := g.grid[strconv.Itoa(target.x)]; ok {
+		if _, ok2 := g.grid[strconv.Itoa(target.x)][strconv.Itoa(target.y)]; ok2 {
+			g.grid[strconv.Itoa(target.x)][strconv.Itoa(target.y)] = nil
 		}
 	}
 	success = true

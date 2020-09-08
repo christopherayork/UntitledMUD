@@ -1,5 +1,6 @@
 package definitions
 
+import "strconv"
 
 // Generates a Map{} with designated params
 // Currently, it takes no seed, since our target map is fixed
@@ -25,7 +26,7 @@ func (m MapGenerator) Generate() (*Map, bool) {
 		for x := 1; x < 3; x++ {
 			for y := 1; y < 3; y++ {
 				Plot, _ := NewPlot(v, x, y)
-				plots[string(x)][string(y)] = Plot
+				plots[strconv.Itoa(x)][strconv.Itoa(y)] = Plot
 				if x == 2 && y == 2 { // upper-right corner is going to be a special plot
 					Plot.description = "A dark and putrid hole in the cave wall leads to this menacing room, with the light sounds of drumming and low clamoring of fiends within playing outwards."
 				}
@@ -52,63 +53,4 @@ func (m MapGenerator) Generate() (*Map, bool) {
 func NewMapGen(x, y int) (*Map, bool) {
 	generator := MapGenerator{width: x, height: y}
 	return generator.Generate()
-}
-
-var mockup = map[string]map[string]map[string]map[string]map[string]string{
-	"1,1": map[string]map[string]map[string]map[string]string{
-		"1,1": map[string]map[string]map[string]string{
-			"1,1": map[string]map[string]string{
-				"1,1": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-				"1,2": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-				"2,1": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-				"2,2": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-			},
-			"1,2": map[string]map[string]string{
-				"1,1": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-				"1,2": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-				"2,1": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-				"2,2": map[string]string{
-					"1,1": "Beep1",
-					"1,2": "Beep2",
-					"2,1": "Beep3",
-					"2,2": "Beep4",
-				},
-			},
-		},
-	},
 }
