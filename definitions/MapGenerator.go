@@ -21,14 +21,20 @@ type MapGenerator struct {
 func (m MapGenerator) Generate() (*Map, bool) {
 	Map, _ := NewMap()
 	var mapData map[string]interface{}
-	ReadJSON("map1.json", &mapData)
-	var legend map[string]map[string]string
-	if lgn, okl := mapData["legend"].(map[string]map[string]string); okl {
+	errjs := ReadJSON("map1.json", &mapData)
+	if errjs != nil { fmt.Println(errjs) }
+	var legend map[string]interface{}
+	//fmt.Println(mapData)
+	if lgn, okl := mapData["legend"].(map[string]interface{}); okl {
 		legend = lgn
+	} else {
+		fmt.Println(fmt.Sprintf("%v, %v", lgn, okl))
+		fmt.Println("error: MapGenerator.Generate(), legend failed to load from mapdata")
 	}
+	//return Map, true
 	if maps, okm := mapData["map"].(map[string]interface{}); okm {
 		for kregion, vregion := range maps {
-			// this is the keys for regions
+			// these are the keys for regions
 			// split key into it's coordinates
 			if zones, okr := vregion.(map[string]interface{}); okr {
 				xr, yr := GetCoords(kregion)
@@ -49,34 +55,63 @@ func (m MapGenerator) Generate() (*Map, bool) {
 											if tile, okt := vtile.(string); okt {
 												xt, yt := GetCoords(ktile)
 												Tile, _ := NewTile(Plot, xt, yt)
-												tilevals := legend[tile]
-												Tile.name = tilevals["Name"]
-												Tile.description = tilevals["Description"]
+												if tilevals, tvok := legend[tile].(map[string]string); tvok {
+													// tile holds a string with a reference id for legend
+													Tile.name = tilevals["Name"]
+													Tile.description = tilevals["Description"]
+												}
 											} // should we fail the whole thing on individual tile fail?
 										}
-									} else { return nil, false }
+									} else {
+										fmt.Println("error: MapGenerator.Generate(), Plot failed to be loaded from mapdata")
+										continue
+									}
 								}
-							} else { return nil, false }
+							} else {
+								fmt.Println("error: MapGenerator.Generate(), Area failed to be loaded from mapdata")
+								continue
+
+							}
 						}
-					} else { return nil, false }
+					} else {
+						fmt.Println("error: MapGenerator.Generate(), Zone failed to be loaded from mapdata")
+						continue
+					}
 				}
-			} else { return nil, false }
+			} else {
+				fmt.Println("error: MapGenerator.Generate(), Region failed to be loaded from mapdata")
+				continue
+			}
 		}
+	} else {
+		fmt.Println("error: MapGenerator.Generate(), Map failed to be loaded from mapdata")
+		return nil, false
 	}
+	fmt.Println("Map loaded successfully!")
+	fmt.Println(Map)
 	return Map, true
 }
 
 // unloads Unmarshal'd JSON into the result pointer (map of interfaces).
 // no return here, just hang onto your result pointer
-func ReadJSON(fileName string, result *map[string]interface{}) {
+func ReadJSON(fileName string, result *map[string]interface{}) error {
 	jsonFile, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("error: ReadJSON(), cannot open that file")
-		return
+		return fmt.Errorf("error: ReadJSON(), cannot open that file")
 	}
-	defer jsonFile.Close()
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	json.Unmarshal([]byte(byteValue), result)
+	defer func() {
+		err4 := jsonFile.Close()
+		if err4 != nil { fmt.Println(fmt.Errorf("error: ReadJSON(), couldn't close that file")) }
+	}()
+	byteValue, err2 := ioutil.ReadAll(jsonFile)
+	if err2 != nil {
+		return fmt.Errorf("error: ReadJSON(), cannot read jsonFile into byteValue array")
+	}
+	err3 := json.Unmarshal([]byte(byteValue), result)
+	if err3 != nil {
+		return fmt.Errorf("error: ReadJSON(), json.Unmarshal() failed to map binary to result map")
+	}
+	return nil
 }
 
 func GetCoords(merged string) (int, int) {
@@ -94,6 +129,11 @@ func GetCoords(merged string) (int, int) {
 }
 
 func NewMapGen(x, y int) (*Map, bool) {
+	defer panicRecover()
 	generator := MapGenerator{width: x, height: y}
 	return generator.Generate()
+}
+
+func panicRecover() {
+	recover()
 }

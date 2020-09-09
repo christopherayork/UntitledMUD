@@ -8,6 +8,10 @@ type Map struct {
 	name string
 }
 
+func (m Map) String() string {
+	return fmt.Sprintf("%v", m.grid.grid)
+}
+
 func (m Map) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Region); ok {
 		gridSuccess := m.grid.Enter(tan, x, y)

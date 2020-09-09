@@ -1,6 +1,4 @@
-package UntitledMUD
-
-// import "./definitions"
+package verbs
 
 import (
 	"bufio"

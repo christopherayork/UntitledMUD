@@ -1,6 +1,9 @@
 package definitions
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Region struct {
 	Tangible
@@ -18,7 +21,8 @@ func NewRegion(m Gridded, x, y int, dirs ...map[string]*Region) (*Region, error)
 	region := Region{}
 	region.grid = NewGrid(&region)
 	region.loc = m
-	m.Enter(region, x, y)
+	ok := m.Enter(region, x, y)
+	if !ok { fmt.Println("NewRegion() failed on Map.Enter()") }
 	for i := range dirs {
 		if i > 0 { break }
 		if v, ok := dirs[i]["n"]; ok { region.SetDirection("n", v) }
