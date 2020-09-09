@@ -1,6 +1,13 @@
 package definitions
 
-import "strconv"
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"strconv"
+	"strings"
+)
 
 // Generates a Map{} with designated params
 // Currently, it takes no seed, since our target map is fixed
@@ -13,41 +20,77 @@ type MapGenerator struct {
 
 func (m MapGenerator) Generate() (*Map, bool) {
 	Map, _ := NewMap()
-	Region, err := NewRegion(Map, 1, 1)
-	if _, ok := err.(error); ok { return nil, false }
-	Zone, _ := NewZone(Region, 1, 1)
-	areas := make([]*Area, 2)
-	Area1, _ := NewArea(Zone, 1, 1)
-	areas[0] = Area1
-	Area2, _ := NewArea(Zone, 1, 2)
-	areas[1] = Area2
-	plots := make(map[string]map[string]*Plot)
-	for _, v := range areas {
-		for x := 1; x < 3; x++ {
-			for y := 1; y < 3; y++ {
-				Plot, _ := NewPlot(v, x, y)
-				plots[strconv.Itoa(x)][strconv.Itoa(y)] = Plot
-				if x == 2 && y == 2 { // upper-right corner is going to be a special plot
-					Plot.description = "A dark and putrid hole in the cave wall leads to this menacing room, with the light sounds of drumming and low clamoring of fiends within playing outwards."
+	var mapData map[string]interface{}
+	ReadJSON("map1.json", &mapData)
+	var legend map[string]map[string]string
+	if lgn, okl := mapData["legend"].(map[string]map[string]string); okl {
+		legend = lgn
+	}
+	if maps, okm := mapData["map"].(map[string]interface{}); okm {
+		for kregion, vregion := range maps {
+			// this is the keys for regions
+			// split key into it's coordinates
+			if zones, okr := vregion.(map[string]interface{}); okr {
+				xr, yr := GetCoords(kregion)
+				Region, _ := NewRegion(Map, xr, yr)
+				for kzone, vzone := range zones {
+					if areas, okz := vzone.(map[string]interface{}); okz {
+						xz, yz := GetCoords(kzone)
+						Zone, _ := NewZone(Region, xz, yz)
+						for karea, varea := range areas {
+							if plots, oka := varea.(map[string]interface{}); oka {
+								xa, ya := GetCoords(karea)
+								Area, _ := NewArea(Zone, xa, ya)
+								for kplot, vplot := range plots {
+									if tiles, okp := vplot.(map[string]interface{}); okp {
+										xp, yp := GetCoords(kplot)
+										Plot, _ := NewPlot(Area, xp, yp)
+										for ktile, vtile := range tiles {
+											if tile, okt := vtile.(string); okt {
+												xt, yt := GetCoords(ktile)
+												Tile, _ := NewTile(Plot, xt, yt)
+												tilevals := legend[tile]
+												Tile.name = tilevals["Name"]
+												Tile.description = tilevals["Description"]
+											} // should we fail the whole thing on individual tile fail?
+										}
+									} else { return nil, false }
+								}
+							} else { return nil, false }
+						}
+					} else { return nil, false }
 				}
-			}
-		}
-	} // plots created, now lets make tiles
-	// very simple square algorithm
-	tx, ty := 1,1
-	for _, v := range plots {
-		for _, v2 := range v {
-			for x := tx; x < tx+2; x++ {
-				for y := ty; y < ty+2; y++ {
-					Tile, _ := NewTile(v2, x, y)
-					Tile.description = "Boop"
-					ty++
-				}
-				tx++
-			}
+			} else { return nil, false }
 		}
 	}
 	return Map, true
+}
+
+// unloads Unmarshal'd JSON into the result pointer (map of interfaces).
+// no return here, just hang onto your result pointer
+func ReadJSON(fileName string, result *map[string]interface{}) {
+	jsonFile, err := os.Open(fileName)
+	if err != nil {
+		fmt.Println("error: ReadJSON(), cannot open that file")
+		return
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	json.Unmarshal([]byte(byteValue), result)
+}
+
+func GetCoords(merged string) (int, int) {
+	arr := strings.Split(merged, ",")
+	if len(arr) == 1 {
+		firstVal, _ := strconv.Atoi(arr[0])
+		return firstVal, 0
+	} else if len(arr) < 1 {
+		return 0, 0
+	} else {
+		firstVal, _ := strconv.Atoi(arr[0])
+		secondVal, _ := strconv.Atoi(arr[1])
+		return firstVal, secondVal
+	}
 }
 
 func NewMapGen(x, y int) (*Map, bool) {

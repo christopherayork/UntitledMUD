@@ -10,7 +10,7 @@
 		"8": {"Name": "Mt Drakkenspire - Cavern", "Description": "Dark and dreary, faint sounds of hissing and thumping can be heard echoing along the walls of the ancient caverns. The smells of nearby Goblins is nearly enough to induce asphyxiation."},
 		"9": {"Name": "Mt Drakkenspire - Sulphuric Crown", "Description": "The stench of goblin-kind grows overwhelmingly strong. Whimpers of servants taking their lashings can be heard in the distance, and an ominous presence looms just beyond."},
 		"10": {"Name": "Mt Drakkenspire - Throne Room", "Description": "Just beyond jagged stalagmites and staggered pillars stands an opening lit by ill-gotten means. Upon a bone-crafted throne sits an ugly sight, the king of the Drakkenspire Goblins."}
-	}
+	},
 	"map": {
 		"1,1": {
 			"1,1": {
