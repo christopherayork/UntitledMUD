@@ -1,6 +1,9 @@
 package definitions
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Area struct {
 	Tangible
@@ -18,7 +21,8 @@ func NewArea(g Gridded, x, y int, dirs ...map[string]*Area) (*Area, error) {
 	area := Area{}
 	area.grid = NewGrid(area)
 	area.loc = g
-	g.Enter(area, x, y)
+	oka := g.Enter(area, x, y)
+	if !oka { fmt.Println("NewArea() failed on Zone.Enter()") }
 	for i := range dirs {
 		if i > 0 { break }
 		if v, ok := dirs[i]["n"]; ok { area.SetDirection("n", v) }

@@ -33,20 +33,20 @@ func NewRegion(m Gridded, x, y int, dirs ...map[string]*Region) (*Region, error)
 	return &region, nil
 }
 
-func (t Region) SetDirection(d string, v *Region) bool {
+func (r Region) SetDirection(d string, v *Region) bool {
 	switch d {
 		case "n":
-			t.north = v
-			v.south = &t // doubly linked
+			r.north = v
+			v.south = &r // doubly linked
 		case "s":
-			t.south = v
-			v.north = &t
+			r.south = v
+			v.north = &r
 		case "e":
-			t.east = v
-			v.west = &t
+			r.east = v
+			v.west = &r
 		case "w":
-			t.west = v
-			v.east = &t
+			r.west = v
+			v.east = &r
 		default: return false
 	}
 	return true

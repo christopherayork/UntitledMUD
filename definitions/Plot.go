@@ -1,7 +1,9 @@
 package definitions
 
-
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // smallest grid available
 // add extra handlers to support adding tiles to it's grid
@@ -23,7 +25,8 @@ func NewPlot(g Gridded, x, y int, dirs ...map[string]*Plot) (*Plot, error) {
 	plot := Plot{}
 	plot.grid = NewGrid(plot)
 	plot.loc = g
-	g.Enter(plot, x, y)
+	okp := g.Enter(plot, x, y)
+	if !okp { fmt.Println("NewPlot() failed on Area.Enter()") }
 	for i := range dirs {
 		if i > 0 { break }
 		if v, ok := dirs[i]["n"]; ok { plot.SetDirection("n", v) }

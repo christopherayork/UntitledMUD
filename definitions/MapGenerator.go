@@ -88,7 +88,6 @@ func (m MapGenerator) Generate() (*Map, bool) {
 		return nil, false
 	}
 	fmt.Println("Map loaded successfully!")
-	fmt.Println(Map)
 	return Map, true
 }
 

@@ -9,7 +9,8 @@ type Map struct {
 }
 
 func (m Map) String() string {
-	return fmt.Sprintf("%v", m.grid.grid)
+	return fmt.Sprintf("Type: %T, Name: %v, Description: %v, Grid: %v", m, m.name, m.description, m.grid)
+	//return fmt.Sprintf("%v", m.grid.grid)
 }
 
 func (m Map) Enter(target Display, x, y int) bool {

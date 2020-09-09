@@ -1,6 +1,9 @@
 package definitions
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Zone struct {
 	Tangible
@@ -19,7 +22,8 @@ func NewZone(g Gridded, x, y int, dirs ...map[string]*Zone) (*Zone, error) {
 	zone := Zone{}
 	zone.grid = NewGrid(&zone)
 	zone.loc = g
-	g.Enter(zone, x, y)
+	oke := g.Enter(zone, x, y)
+	if !oke { fmt.Println("NewZone() failed on Region.Enter()") }
 	for i := range dirs {
 		if i > 0 { break }
 		if v, ok := dirs[i]["n"]; ok { zone.SetDirection("n", v) }

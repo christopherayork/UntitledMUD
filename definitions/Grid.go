@@ -6,6 +6,10 @@ type Grid struct {
 	parent *Gridded
 }
 
+func (g Grid) String() string {
+	return "Placeholder -> create visual grid from items in grid.map"
+}
+
 
 // make a function to link all tangibles
 

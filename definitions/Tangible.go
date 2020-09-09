@@ -28,7 +28,7 @@ func (t Tangible) Apply(target Display) {
 }
 
 func (t Tangible) String() string {
-	return t.description
+	return fmt.Sprintf("Type: %T, Name: %v, Description: %v", t, t.name, t.description)
 }
 
 func (t Tangible) Enter(target Display, x, y int) bool {
