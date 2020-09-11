@@ -6,6 +6,57 @@ type Grid struct {
 	parent *Gridded
 }
 
+/*
+	Grid rework!
+	Currently, each individual grid has to be pieced together when generating a more cohesive map
+	also, when auto-connecting tiles to each other, (and every other non movable tangible), it will
+	simplify the process by placing everything in it's proper position with no duplicates possible
+	as is, there can be duplicate tangibles within a grid since they are separate
+	the following change will appear as
+
+	grid: {
+		maps: {
+			z: map {...},
+			z: map {...}
+		},
+		regions: {
+			x,y: region {...},
+			x,y: region {...}
+		},
+		zones: {
+			x,y: zone {...},
+			x,y: zone {...}
+		},
+		areas: {
+			x,y: area {...},
+			x,y: area {...}
+		},
+		plots: {
+			x,y: plot {...},
+			x,y: plot {...}
+		},
+		tiles: {
+			x,y: tile {...},
+			x,y: tile {...}
+		}
+	}
+
+	other things to consider are, with this change, how will each parent grouping spread over the map
+	will they be forced into rectangular formations?
+	will they take up many keys (x,y pairs) within their respective grid?
+	idea:
+	group: {
+		x,y: &group1,
+		x,y: &group1,
+		x,y: &group2,
+		x,y: &group3
+	}
+	the idea is the same as relational databases; but in this case the prospect of persistence is ignored
+	since we're using pointers, they will be invalid to use in reloading a map, additional measures will be required if the system ever moves towards it
+
+	one other thing to finalize is the idea of the z axis, but for the sake of mvp, we can leave that out until future updates
+ */
+
 func (g Grid) String() string {
 	return "Placeholder -> create visual grid from items in grid.map"
 }
