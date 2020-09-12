@@ -2,8 +2,7 @@ package definitions
 import "strconv"
 
 type Grid struct {
-	grid map[string]map[string]*Tangible
-	parent *Gridded
+	grid map[string]map[string]map[string]*Tangible
 }
 
 /*
@@ -16,28 +15,28 @@ type Grid struct {
 
 	grid: {
 		maps: {
-			z: map {...},
-			z: map {...}
+			x: { y: map {...} },
+			x: { y: map {...} }
 		},
 		regions: {
-			x,y: region {...},
-			x,y: region {...}
+			x: { y: region {...} },
+			x: { y: region {...} }
 		},
 		zones: {
-			x,y: zone {...},
-			x,y: zone {...}
+			x: { y: zone {...} },
+			x: { y: zone {...} }
 		},
 		areas: {
-			x,y: area {...},
-			x,y: area {...}
+			x: { y: area {...} },
+			x: { y: area {...} }
 		},
 		plots: {
-			x,y: plot {...},
-			x,y: plot {...}
+			x: { y: plot {...} },
+			x: { y: plot {...} }
 		},
 		tiles: {
-			x,y: tile {...},
-			x,y: tile {...}
+			x: { y: tile {...} },
+			x: { y: tile {...} }
 		}
 	}
 
@@ -64,29 +63,55 @@ func (g Grid) String() string {
 
 // make a function to link all tangibles
 
-func NewGrid(p interface{}) *Grid {
-	if val, ok := p.(Gridded); ok {
-		return &Grid{grid: make(map[string]map[string]*Tangible), parent: &val}
-	} else { return &Grid{} }
+func NewGrid() *Grid {
+	return &Grid{grid: make(map[string]map[string]map[string]*Tangible)}
 }
 
-func (g Grid) GetValue(x, y int) *Tangible {
-	if v, ok := g.grid[strconv.Itoa(x)]; ok {
-		if v2, ok2 := v[strconv.Itoa(y)]; ok2 {
-			return v2
+/* Gets a value out of the Grid's map
+Takes in values such that g.grid["region"]["1"]["1"] returns a *Tangible.
+Valid call would be g.GetValue("zone", "3", "4").
+If a *Tangible exists within that location, it will be returned
+*/
+func (g Grid) GetValue(sect string, x, y int) *Tangible {
+	if section, ok := g.grid[sect]; ok {
+		if v, ok := section[strconv.Itoa(x)]; ok {
+			if v2, ok2 := v[strconv.Itoa(y)]; ok2 {
+				return v2
+			}
 		}
 	}
 	return nil
 }
 
+// Generates a key out of a target type for the grid categories.
+// If it returns an empty string, the target does not map to any valid categories in the grid
+func GetGridCat(target interface{}) string {
+	var key string
+	switch _ := target.(type) {
+		case Map: key = "map"
+		case Region: key = "region"
+		case Zone: key = "zone"
+		case Area: key = "area"
+		case Plot: key = "plot"
+		case Tile: key = "tile"
+		default: return ""
+	}
+	return key
+}
+
 func (g Grid) Enter(target interface{}, x int, y int) bool {
 	success := false
-	if _, ok := g.grid[strconv.Itoa(x)]; !ok {
-		g.grid[strconv.Itoa(x)] = make(map[string]*Tangible)
+	key := GetGridCat(target)
+	if len(key) == 0 { return false } // we can't enter a non valid type!
+	tmap := g.grid[key]
+	if _, ok := tmap[strconv.Itoa(x)]; !ok {
+		tmap[strconv.Itoa(x)] = make(map[string]*Tangible)
 	}
 	if tan, ok2 := target.(Tangible); ok2 {
-		g.grid[strconv.Itoa(x)][strconv.Itoa(y)] = &tan
-		tan.loc = *g.parent
+		tmap[strconv.Itoa(x)][strconv.Itoa(y)] = &tan
+		//tan.loc = *g.parent
+		// i need to figure out an easy way for tangibles to be containerized into their parents
+		// now that grids are centralized, it needs manually synced on updates
 		tan.x = x
 		tan.y = y
 		success = true
@@ -100,10 +125,13 @@ func (g Grid) Entered(target *Tangible) {
 }
 
 func (g Grid) Exit(target *Tangible) bool {
+	// consider deleting the keys when they're empty, instead of leaving nil entries
 	success := false
-	if _, ok := g.grid[strconv.Itoa(target.x)]; ok {
-		if _, ok2 := g.grid[strconv.Itoa(target.x)][strconv.Itoa(target.y)]; ok2 {
-			g.grid[strconv.Itoa(target.x)][strconv.Itoa(target.y)] = nil
+	key := GetGridCat(target)
+	tmap := g.grid[key]
+	if _, ok := tmap[strconv.Itoa(target.x)]; ok {
+		if _, ok2 := tmap[strconv.Itoa(target.x)][strconv.Itoa(target.y)]; ok2 {
+			tmap[strconv.Itoa(target.x)][strconv.Itoa(target.y)] = nil
 		}
 	}
 	success = true

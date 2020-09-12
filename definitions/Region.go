@@ -7,20 +7,21 @@ import (
 
 type Region struct {
 	Tangible
-	grid *Grid
 	north *Region
 	south *Region
 	east *Region
 	west *Region
+	parentMap *Map
+	grid *Grid
 }
 
-func NewRegion(m Gridded, x, y int, dirs ...map[string]*Region) (*Region, error) {
+func NewRegion(m Gridded, g Grid, x, y int, dirs ...map[string]*Region) (*Region, error) {
 	if _, ok := m.(Map); !ok {
 		return &Region{}, errors.New("error: NewRegion(), argument m required to be of type *Map")
 	}
 	region := Region{}
-	region.grid = NewGrid(&region)
-	region.loc = m
+	region.loc = &m
+	region.grid = &g
 	ok := m.Enter(region, x, y)
 	if !ok { fmt.Println("NewRegion() failed on Map.Enter()") }
 	for i := range dirs {

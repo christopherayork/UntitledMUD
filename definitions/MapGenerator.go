@@ -18,8 +18,13 @@ type MapGenerator struct {
 
 }
 
+// change Generate to return a Grid instead of a Map
+
+
 func (m MapGenerator) Generate() (*Map, bool) {
+	Grid := NewGrid()
 	Map, _ := NewMap()
+	Grid.Enter(Map, 1,1) // we'll only have a single map for now, but later abstractions will call for reading the map coords out of the map file
 	var mapData map[string]interface{}
 	errjs := ReadJSON("map1.json", &mapData)
 	if errjs != nil { fmt.Println(errjs) }
@@ -38,7 +43,7 @@ func (m MapGenerator) Generate() (*Map, bool) {
 			// split key into it's coordinates
 			if zones, okr := vregion.(map[string]interface{}); okr {
 				xr, yr := GetCoords(kregion)
-				Region, _ := NewRegion(Map, xr, yr)
+				Region, _ := NewRegion(Map, *Grid, xr, yr)
 				for kzone, vzone := range zones {
 					if areas, okz := vzone.(map[string]interface{}); okz {
 						xz, yz := GetCoords(kzone)

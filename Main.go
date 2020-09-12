@@ -45,11 +45,11 @@ func main() {
 }
 
 type World struct {
-	space *def.Map
+	space *def.Grid // if we ever expand into multiple worlds, this will hold a Map{}, and Grid{} will be expanded to hold multiple Worlds
 	// we could fill in a lot of extra useful utility things for the World struct like time, etc
 }
 
-func NewWorld(m *def.Map) World {
+func NewWorld(m *def.Grid) World {
 	w := World{}
 	w.space = m
 	return w

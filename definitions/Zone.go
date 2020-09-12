@@ -14,14 +14,14 @@ type Zone struct {
 	west *Zone
 }
 
-func NewZone(g Gridded, x, y int, dirs ...map[string]*Zone) (*Zone, error) {
+func NewZone(g Gridded, grid Grid, x, y int, dirs ...map[string]*Zone) (*Zone, error) {
 	_, ok := g.(Region)
 	if !ok {
 		return &Zone{}, errors.New("error: NewZone(), type Zone requires parameter p of type Region")
 	}
 	zone := Zone{}
-	zone.grid = NewGrid(&zone)
-	zone.loc = g
+	zone.grid = &grid
+	zone.loc = &g
 	oke := g.Enter(zone, x, y)
 	if !oke { fmt.Println("NewZone() failed on Region.Enter()") }
 	for i := range dirs {

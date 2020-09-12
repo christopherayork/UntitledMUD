@@ -11,12 +11,12 @@ import "fmt"
 
 type Map struct {
 	Tangible
-	grid *Grid
 	name string
+	grid *Grid
 }
 
 func (m Map) String() string {
-	return fmt.Sprintf("Type: %T, Name: %v, Description: %v, Grid: %v", m, m.name, m.description, m.grid)
+	return fmt.Sprintf("Type: %T, Name: %v, Description: %v", m, m.name, m.description)
 	//return fmt.Sprintf("%v", m.grid.grid)
 }
 
@@ -44,6 +44,5 @@ var maps = 0
 func NewMap() (*Map, error) {
 	maps++
 	m := Map{name: fmt.Sprintf("Map%v", maps)}
-	m.grid = NewGrid(&m)
 	return &m, nil
 }

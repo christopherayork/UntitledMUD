@@ -6,7 +6,7 @@ type Tangible struct {
 	name string
 	description string
 	contents []*Individual
-	loc Gridded
+	loc *Gridded
 	x int
 	y int
 }
