@@ -21,7 +21,7 @@ type MapGenerator struct {
 // change Generate to return a Grid instead of a Map
 
 
-func (m MapGenerator) Generate() (*Map, bool) {
+func (m MapGenerator) Generate() (*Grid, bool) {
 	Grid := NewGrid()
 	Map, _ := NewMap()
 	Grid.Enter(Map, 1,1) // we'll only have a single map for now, but later abstractions will call for reading the map coords out of the map file
@@ -47,19 +47,19 @@ func (m MapGenerator) Generate() (*Map, bool) {
 				for kzone, vzone := range zones {
 					if areas, okz := vzone.(map[string]interface{}); okz {
 						xz, yz := GetCoords(kzone)
-						Zone, _ := NewZone(Region, xz, yz)
+						Zone, _ := NewZone(Region, *Grid, xz, yz)
 						for karea, varea := range areas {
 							if plots, oka := varea.(map[string]interface{}); oka {
 								xa, ya := GetCoords(karea)
-								Area, _ := NewArea(Zone, xa, ya)
+								Area, _ := NewArea(Zone, *Grid, xa, ya)
 								for kplot, vplot := range plots {
 									if tiles, okp := vplot.(map[string]interface{}); okp {
 										xp, yp := GetCoords(kplot)
-										Plot, _ := NewPlot(Area, xp, yp)
+										Plot, _ := NewPlot(Area, *Grid, xp, yp)
 										for ktile, vtile := range tiles {
 											if tile, okt := vtile.(string); okt {
 												xt, yt := GetCoords(ktile)
-												Tile, _ := NewTile(Plot, xt, yt)
+												Tile, _ := NewTile(Plot, *Grid, xt, yt)
 												if tilevals, tvok := legend[tile].(map[string]string); tvok {
 													// tile holds a string with a reference id for legend
 													Tile.name = tilevals["Name"]
@@ -93,7 +93,7 @@ func (m MapGenerator) Generate() (*Map, bool) {
 		return nil, false
 	}
 	fmt.Println("Map loaded successfully!")
-	return Map, true
+	return Grid, true
 }
 
 // unloads Unmarshal'd JSON into the result pointer (map of interfaces).
@@ -132,7 +132,7 @@ func GetCoords(merged string) (int, int) {
 	}
 }
 
-func NewMapGen(x, y int) (*Map, bool) {
+func NewMapGen(x, y int) (*Grid, bool) {
 	defer panicRecover()
 	generator := MapGenerator{width: x, height: y}
 	return generator.Generate()

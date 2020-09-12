@@ -17,18 +17,20 @@ type Tile struct {
 	south *Tile
 	east *Tile
 	west *Tile
+	grid *Grid
 }
 
 // Creates a new Tile{} and returns it if it can successfully Enter() a parent Plot{}.
 // The dirs parameter is optional and takes a map expected to hold *Tile pointers with the options of n, s, e, w for keys.
-func NewTile(g Gridded, x, y int, dirs ...map[string]*Tile) (*Tile, error) {
-	if tan, ok := g.(Plot); ok {
+func NewTile(g Gridded, grid Grid, x, y int, dirs ...map[string]*Tile) (*Tile, error) {
+	if _, ok := g.(Plot); ok {
 		tile := Tile{}
 		// call g.Enter(tile and get permission back before setting tile.loc)
 		if !g.Enter(tile, x, y) { return nil, errors.New("error: NewTile(), parent denied entrance to it's grid") }
 		tile.x = x
 		tile.y = y
-		tile.loc = tan
+		tile.loc = &g
+		tile.grid = &grid
 		for i := range dirs {
 			if i > 0 { break }
 			if v, ok := dirs[i]["n"]; ok { tile.SetDirection("n", v) }
@@ -91,12 +93,17 @@ func (t Tile) Enter(target Individual) bool {
 	exists := containsInd(t.contents, &target)
 	if exists { return true
 	} else {
-		parentPerms := t.loc.Enter(target, t.x, t.y)
-		if !parentPerms { return false }
-		t.contents = append(t.contents, &target)
-		defer t.Entered(target)
-		return true
+		tloc := *t.loc
+		// currently, a tile must be in a location for it to be valid for entering
+		if _, ok := tloc.(Gridded); ok {
+			parentPerms := tloc.Enter(target, t.x, t.y)
+			if !parentPerms { return false }
+			t.contents = append(t.contents, &target)
+			defer t.Entered(target)
+			return true
+		}
 	}
+	return false
 	// this is not finished, we're going to use containsInd() to see if the item is in the slice
 	// if it is, we return true (though it would be a bug to try to enter a tile you're already in)
 	// if they aren't, we add them in and return true on success

@@ -15,7 +15,7 @@ var MAP_GEN_HEIGHT = 50
 
 func main() {
 	fmt.Println("Welcome to UntitledMUD!")
-	Map, ok := def.NewMapGen(MAP_GEN_WIDTH, MAP_GEN_HEIGHT)
+	Grid, ok := def.NewMapGen(MAP_GEN_WIDTH, MAP_GEN_HEIGHT)
 	// do any other things like world loading
 	// as the scope expands, player client and server would be seperated into different applications
 	if !ok {
@@ -23,10 +23,10 @@ func main() {
 		time.Sleep(1000)
 		return
 	} // we can't play without a map
-	world = NewWorld(Map)
+	world = NewWorld(Grid)
 	// when we use the MapGenerator, if we ever implement saving we will need much additional functionality to detect if a map has been generated
 	// we need to create a world that holds our map, and is globally accessible to the gameloop and other game methods
-	fmt.Println(Map)
+	fmt.Println(Grid)
 	fmt.Println("Enter a command!")
 	scanner := bufio.NewScanner(os.Stdin)
 	input := ""

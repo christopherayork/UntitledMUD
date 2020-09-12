@@ -14,13 +14,13 @@ type Area struct {
 	west *Area
 }
 
-func NewArea(g Gridded, x, y int, dirs ...map[string]*Area) (*Area, error) {
+func NewArea(g Gridded, grid Grid, x, y int, dirs ...map[string]*Area) (*Area, error) {
 	if _, ok := g.(Zone); !ok {
 		return &Area{}, errors.New("error: NewArea(), argument for parameter g must be of type Zone")
 	}
 	area := Area{}
-	area.grid = NewGrid(area)
-	area.loc = g
+	area.grid = &grid
+	area.loc = &g
 	oka := g.Enter(area, x, y)
 	if !oka { fmt.Println("NewArea() failed on Zone.Enter()") }
 	for i := range dirs {

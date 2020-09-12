@@ -18,13 +18,13 @@ type Plot struct {
 
 // func (t Tangible) Apply(target Display) {}
 
-func NewPlot(g Gridded, x, y int, dirs ...map[string]*Plot) (*Plot, error) {
+func NewPlot(g Gridded, grid Grid, x, y int, dirs ...map[string]*Plot) (*Plot, error) {
 	if _, ok := g.(Area); !ok {
 		return &Plot{}, errors.New("error: NewPlot(), argument for parameter g must be of type Area")
 	}
 	plot := Plot{}
-	plot.grid = NewGrid(plot)
-	plot.loc = g
+	plot.grid = &grid
+	plot.loc = &g
 	okp := g.Enter(plot, x, y)
 	if !okp { fmt.Println("NewPlot() failed on Area.Enter()") }
 	for i := range dirs {
