@@ -37,6 +37,7 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 		fmt.Println("error: MapGenerator.Generate(), legend failed to load from mapdata")
 	}
 	//return Map, true
+	// map format has changed, a rewrite of this is due now
 	if maps, okm := mapData["map"].(map[string]interface{}); okm {
 		for kregion, vregion := range maps {
 			// these are the keys for regions

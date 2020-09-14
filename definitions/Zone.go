@@ -10,7 +10,7 @@ type Zone struct {
 	grid *Grid
 }
 
-func NewZone(g Gridded, grid Grid, x, y int, dirs ...map[string]*Zone) (*Zone, error) {
+func NewZone(g Gridded, grid Grid, x, y int, coords ...map[string]map[string]bool) (*Zone, error) {
 	_, ok := g.(Region)
 	if !ok {
 		return &Zone{}, errors.New("error: NewZone(), type Zone requires parameter p of type Region")

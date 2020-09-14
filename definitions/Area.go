@@ -14,7 +14,7 @@ type Area struct {
 	west *Area
 }
 
-func NewArea(g Gridded, grid Grid, x, y int) (*Area, error) {
+func NewArea(g Gridded, grid Grid, x, y int, coords ...map[string]map[string]bool) (*Area, error) {
 	if _, ok := g.(Zone); !ok {
 		return &Area{}, errors.New("error: NewArea(), argument for parameter g must be of type Zone")
 	}

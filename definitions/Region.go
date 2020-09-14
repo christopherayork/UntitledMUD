@@ -11,7 +11,7 @@ type Region struct {
 	grid *Grid
 }
 
-func NewRegion(m Gridded, grid Grid, x, y int, dirs ...map[string]*Region) (*Region, error) {
+func NewRegion(m Gridded, grid Grid, x, y int, coords ...map[string]map[string]bool) (*Region, error) {
 	if _, ok := m.(Map); !ok {
 		return &Region{}, errors.New("error: NewRegion(), argument m required to be of type *Map")
 	}

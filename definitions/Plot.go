@@ -14,7 +14,7 @@ type Plot struct {
 
 // func (t Tangible) Apply(target Display) {}
 
-func NewPlot(g Gridded, grid Grid, x, y int, dirs ...map[string]*Plot) (*Plot, error) {
+func NewPlot(g Gridded, grid Grid, x, y int, coords ...map[string]map[string]bool) (*Plot, error) {
 	if _, ok := g.(Area); !ok {
 		return &Plot{}, errors.New("error: NewPlot(), argument for parameter g must be of type Area")
 	}
