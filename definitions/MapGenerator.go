@@ -21,6 +21,15 @@ type MapGenerator struct {
 // change Generate to return a Grid instead of a Map
 
 
+func PullField(mapData map[string]interface{}, sect string) []map[string]interface{} {
+	var result []map[string]interface{}
+	if sec, ok := mapData[sect].([]map[string]interface{}); ok { result = sec } else {
+		fmt.Println(fmt.Sprintf("%v, %v", sec, ok))
+		fmt.Println(fmt.Sprintf("error: MapGenerator.Generate(), %v failed to load from mapdata", sect))
+	}
+	return result
+}
+
 func (m MapGenerator) Generate() (*Grid, bool) {
 	Grid := NewGrid()
 	Map, _ := NewMap()
@@ -29,70 +38,17 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	errjs := ReadJSON("map1.json", &mapData)
 	if errjs != nil { fmt.Println(errjs) }
 	var legend map[string]interface{}
-	//fmt.Println(mapData)
-	if lgn, okl := mapData["legend"].(map[string]interface{}); okl {
-		legend = lgn
-	} else {
+	if lgn, okl := mapData["legend"].(map[string]interface{}); okl { legend = lgn } else {
 		fmt.Println(fmt.Sprintf("%v, %v", lgn, okl))
 		fmt.Println("error: MapGenerator.Generate(), legend failed to load from mapdata")
 	}
-	//return Map, true
-	// map format has changed, a rewrite of this is due now
-	if maps, okm := mapData["map"].(map[string]interface{}); okm {
-		for kregion, vregion := range maps {
-			// these are the keys for regions
-			// split key into it's coordinates
-			if zones, okr := vregion.(map[string]interface{}); okr {
-				xr, yr := GetCoords(kregion)
-				Region, _ := NewRegion(Map, *Grid, xr, yr)
-				for kzone, vzone := range zones {
-					if areas, okz := vzone.(map[string]interface{}); okz {
-						xz, yz := GetCoords(kzone)
-						Zone, _ := NewZone(Region, *Grid, xz, yz)
-						for karea, varea := range areas {
-							if plots, oka := varea.(map[string]interface{}); oka {
-								xa, ya := GetCoords(karea)
-								Area, _ := NewArea(Zone, *Grid, xa, ya)
-								for kplot, vplot := range plots {
-									if tiles, okp := vplot.(map[string]interface{}); okp {
-										xp, yp := GetCoords(kplot)
-										Plot, _ := NewPlot(Area, *Grid, xp, yp)
-										for ktile, vtile := range tiles {
-											if tile, okt := vtile.(string); okt {
-												xt, yt := GetCoords(ktile)
-												Tile, _ := NewTile(Plot, *Grid, xt, yt)
-												if tilevals, tvok := legend[tile].(map[string]string); tvok {
-													// tile holds a string with a reference id for legend
-													Tile.name = tilevals["Name"]
-													Tile.description = tilevals["Description"]
-												}
-											} // should we fail the whole thing on individual tile fail?
-										}
-									} else {
-										fmt.Println("error: MapGenerator.Generate(), Plot failed to be loaded from mapdata")
-										continue
-									}
-								}
-							} else {
-								fmt.Println("error: MapGenerator.Generate(), Area failed to be loaded from mapdata")
-								continue
+	regions := PullField(mapData, "regions")
+	zones := PullField(mapData, "zones")
+	areas := PullField(mapData, "areas")
+	plots := PullField(mapData, "plots")
+	// NewRegion(Map, Grid, 0, 0, regions)
+	// will need to change NewRegion() to support the new map format
 
-							}
-						}
-					} else {
-						fmt.Println("error: MapGenerator.Generate(), Zone failed to be loaded from mapdata")
-						continue
-					}
-				}
-			} else {
-				fmt.Println("error: MapGenerator.Generate(), Region failed to be loaded from mapdata")
-				continue
-			}
-		}
-	} else {
-		fmt.Println("error: MapGenerator.Generate(), Map failed to be loaded from mapdata")
-		return nil, false
-	}
 	fmt.Println("Map loaded successfully!")
 	return Grid, true
 }
