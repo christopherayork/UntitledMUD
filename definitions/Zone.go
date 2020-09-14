@@ -8,10 +8,6 @@ import (
 type Zone struct {
 	Tangible
 	grid *Grid
-	north *Zone
-	south *Zone
-	east *Zone
-	west *Zone
 }
 
 func NewZone(g Gridded, grid Grid, x, y int, dirs ...map[string]*Zone) (*Zone, error) {
@@ -20,44 +16,18 @@ func NewZone(g Gridded, grid Grid, x, y int, dirs ...map[string]*Zone) (*Zone, e
 		return &Zone{}, errors.New("error: NewZone(), type Zone requires parameter p of type Region")
 	}
 	zone := Zone{}
+	if !grid.Enter(zone, x, y) { return nil, errors.New("error: NewZone(), could not enter the zone into the grid at that location") }
 	zone.grid = &grid
 	zone.loc = &g
 	oke := g.Enter(zone, x, y)
 	if !oke { fmt.Println("NewZone() failed on Region.Enter()") }
-	for i := range dirs {
-		if i > 0 { break }
-		if v, ok := dirs[i]["n"]; ok { zone.SetDirection("n", v) }
-		if v, ok := dirs[i]["s"]; ok { zone.SetDirection("s", v) }
-		if v, ok := dirs[i]["e"]; ok { zone.SetDirection("e", v) }
-		if v, ok := dirs[i]["w"]; ok { zone.SetDirection("w", v) }
-	}
 	return &zone, nil
-}
-
-func (t Zone) SetDirection(d string, v *Zone) bool {
-	switch d {
-		case "n":
-			t.north = v
-			v.south = &t // doubly linked
-		case "s":
-			t.south = v
-			v.north = &t
-		case "e":
-			t.east = v
-			v.west = &t
-		case "w":
-			t.west = v
-			v.east = &t
-		default: return false
-	}
-	return true
 }
 
 func (z Zone) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Area); ok {
-		gridSuccess := z.grid.Enter(tan, x, y)
-		if gridSuccess { defer z.Entered(tan) }
-		return gridSuccess
+		defer z.Entered(tan)
+		return true
 	}
 	return false
 }

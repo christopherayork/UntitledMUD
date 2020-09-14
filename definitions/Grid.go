@@ -99,24 +99,44 @@ func GetGridCat(target interface{}) string {
 	return key
 }
 
-func (g Grid) Enter(target interface{}, x int, y int) bool {
+// To pass a single item into the grid, supply an x and y.
+// To pass multiple items into the grid, supply a map[string]map[string]string as an arg at the end
+// Takes the format {x: {y: true}}
+func (g Grid) Enter(target interface{}, x int, y int, coords ...map[string]map[string]bool) bool {
 	success := false
 	key := GetGridCat(target)
 	if len(key) == 0 { return false } // we can't enter a non valid type!
+	if x > 0 && y > 0 {
+		success = g.Add(target, strconv.Itoa(x), strconv.Itoa(y), key)
+	} else if len(coords) > 0 {
+		mappings := coords[0]
+		for xc, v := range mappings {
+			for yc, v2 := range v {
+				if v2 {
+					success = g.Add(target, xc, yc, key)
+				}
+			}
+		}
+	}
+	return success
+}
+
+func (g Grid) Add(target interface{}, x, y string, key string) bool {
 	tmap := g.grid[key]
-	if _, ok := tmap[strconv.Itoa(x)]; !ok {
-		tmap[strconv.Itoa(x)] = make(map[string]*Tangible)
+	if _, ok := tmap[x]; !ok {
+		tmap[x] = make(map[string]*Tangible)
 	}
 	if tan, ok2 := target.(Tangible); ok2 {
-		tmap[strconv.Itoa(x)][strconv.Itoa(y)] = &tan
+		tmap[x][y] = &tan
 		//tan.loc = *g.parent
 		// i need to figure out an easy way for tangibles to be containerized into their parents
 		// now that grids are centralized, it needs manually synced on updates
-		tan.x = x
-		tan.y = y
-		success = true
+		xint, xok := strconv.Atoi(x)
+		yint, yok := strconv.Atoi(y)
+		if xok == nil { tan.x = xint }
+		if yok == nil { tan.y = yint }
 		defer g.Entered(&tan)
-		return success
+		return true
 	} else { return false }
 }
 

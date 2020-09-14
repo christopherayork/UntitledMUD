@@ -1,6 +1,8 @@
 package definitions
 
-import "errors"
+import (
+	"errors"
+)
 
 /*
 String this together so that when an Individual enters a Tile, if the Tile isn't within the same Plot that the Tile it left was in
@@ -13,16 +15,12 @@ Leaving a Zone and entering a new one in a different Region calls Region.Enter()
 
 type Tile struct {
 	Tangible
-	north *Tile
-	south *Tile
-	east *Tile
-	west *Tile
 	grid *Grid
 }
 
 // Creates a new Tile{} and returns it if it can successfully Enter() a parent Plot{}.
 // The dirs parameter is optional and takes a map expected to hold *Tile pointers with the options of n, s, e, w for keys.
-func NewTile(g Gridded, grid Grid, x, y int, dirs ...map[string]*Tile) (*Tile, error) {
+func NewTile(g Gridded, grid Grid, x, y int) (*Tile, error) {
 	if _, ok := g.(Plot); ok {
 		tile := Tile{}
 		// call g.Enter(tile and get permission back before setting tile.loc)
@@ -31,13 +29,6 @@ func NewTile(g Gridded, grid Grid, x, y int, dirs ...map[string]*Tile) (*Tile, e
 		tile.y = y
 		tile.loc = &g
 		tile.grid = &grid
-		for i := range dirs {
-			if i > 0 { break }
-			if v, ok := dirs[i]["n"]; ok { tile.SetDirection("n", v) }
-			if v, ok := dirs[i]["s"]; ok { tile.SetDirection("s", v) }
-			if v, ok := dirs[i]["e"]; ok { tile.SetDirection("e", v) }
-			if v, ok := dirs[i]["w"]; ok { tile.SetDirection("w", v) }
-		}
 		return &tile, nil
 	} else {
 		return nil, errors.New("error: NewTile(), argument for parameter g required to be type Plot")
@@ -68,23 +59,18 @@ func removeInd(inds []*Individual, ind *Individual) (bool, []*Individual) {
 	return false, inds
 }
 
-func (t Tile) SetDirection(d string, v *Tile) bool {
-	switch d {
-		case "n":
-			t.north = v
-			v.south = &t // doubly linked
-		case "s":
-			t.south = v
-			v.north = &t
-		case "e":
-			t.east = v
-			v.west = &t
-		case "w":
-			t.west = v
-			v.east = &t
-		default: return false
+func (t Tile) GetDir(dir string) *Tangible {
+	switch dir {
+		case "north":
+			return t.grid.GetValue("tiles", t.x, t.y + 1)
+		case "south":
+			return t.grid.GetValue("tiles", t.x, t.y - 1)
+		case "east":
+			return t.grid.GetValue("tiles", t.x + 1, t.y)
+		case "west":
+			return t.grid.GetValue("tiles", t.x - 1, t.y)
 	}
-	return true
+	return nil
 }
 
 // tiles don't need x or y, they are single points on the map

@@ -7,57 +7,27 @@ import (
 
 type Region struct {
 	Tangible
-	north *Region
-	south *Region
-	east *Region
-	west *Region
 	parentMap *Map
 	grid *Grid
 }
 
-func NewRegion(m Gridded, g Grid, x, y int, dirs ...map[string]*Region) (*Region, error) {
+func NewRegion(m Gridded, grid Grid, x, y int, dirs ...map[string]*Region) (*Region, error) {
 	if _, ok := m.(Map); !ok {
 		return &Region{}, errors.New("error: NewRegion(), argument m required to be of type *Map")
 	}
 	region := Region{}
 	region.loc = &m
-	region.grid = &g
+	if !grid.Enter(region, x, y) { return nil, errors.New("error: NewRegion(), could not enter the region into the grid at that location") }
+	region.grid = &grid // we could set this inside g.Enter(), but we would have to test which type, and map to an interface for all types that match
 	ok := m.Enter(region, x, y)
-	if !ok { fmt.Println("NewRegion() failed on Map.Enter()") }
-	for i := range dirs {
-		if i > 0 { break }
-		if v, ok := dirs[i]["n"]; ok { region.SetDirection("n", v) }
-		if v, ok := dirs[i]["s"]; ok { region.SetDirection("s", v) }
-		if v, ok := dirs[i]["e"]; ok { region.SetDirection("e", v) }
-		if v, ok := dirs[i]["w"]; ok { region.SetDirection("w", v) }
-	}
+	if !ok { fmt.Println("error: NewRegion() failed on Map.Enter()") }
 	return &region, nil
-}
-
-func (r Region) SetDirection(d string, v *Region) bool {
-	switch d {
-		case "n":
-			r.north = v
-			v.south = &r // doubly linked
-		case "s":
-			r.south = v
-			v.north = &r
-		case "e":
-			r.east = v
-			v.west = &r
-		case "w":
-			r.west = v
-			v.east = &r
-		default: return false
-	}
-	return true
 }
 
 func (r Region) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Zone); ok {
-		gridSuccess := r.grid.Enter(tan, x, y)
-		if gridSuccess { defer r.Entered(tan) }
-		return gridSuccess
+		defer r.Entered(tan)
+		return true
 	}
 	return false
 }

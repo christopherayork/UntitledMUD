@@ -10,10 +10,6 @@ import (
 type Plot struct {
 	Tangible
 	grid *Grid
-	north *Plot
-	south *Plot
-	east *Plot
-	west *Plot
 }
 
 // func (t Tangible) Apply(target Display) {}
@@ -23,44 +19,18 @@ func NewPlot(g Gridded, grid Grid, x, y int, dirs ...map[string]*Plot) (*Plot, e
 		return &Plot{}, errors.New("error: NewPlot(), argument for parameter g must be of type Area")
 	}
 	plot := Plot{}
+	if !grid.Enter(plot, x, y) { return nil, errors.New("error: NewPlot(), could not enter the plot into the grid at that location") }
 	plot.grid = &grid
 	plot.loc = &g
 	okp := g.Enter(plot, x, y)
 	if !okp { fmt.Println("NewPlot() failed on Area.Enter()") }
-	for i := range dirs {
-		if i > 0 { break }
-		if v, ok := dirs[i]["n"]; ok { plot.SetDirection("n", v) }
-		if v, ok := dirs[i]["s"]; ok { plot.SetDirection("s", v) }
-		if v, ok := dirs[i]["e"]; ok { plot.SetDirection("e", v) }
-		if v, ok := dirs[i]["w"]; ok { plot.SetDirection("w", v) }
-	}
 	return &plot, nil
-}
-
-func (t Plot) SetDirection(d string, v *Plot) bool {
-	switch d {
-		case "n":
-			t.north = v
-			v.south = &t // doubly linked
-		case "s":
-			t.south = v
-			v.north = &t
-		case "e":
-			t.east = v
-			v.west = &t
-		case "w":
-			t.west = v
-			v.east = &t
-		default: return false
-	}
-	return true
 }
 
 func (p Plot) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Tile); ok {
-		gridSuccess := p.grid.Enter(&tan, x, y)
-		if gridSuccess { defer p.Entered(tan) }
-		return gridSuccess
+		defer p.Entered(tan)
+		return true
 	}
 	if ind, ok := target.(Individual); ok {
 		// output description to target
