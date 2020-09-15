@@ -30,7 +30,7 @@ func PullField(mapData map[string]interface{}, sect string) []map[string]interfa
 	return result
 }
 
-func CreateTypes(targets []map[string]interface{}, callback func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool)) {
+func CreateTypes(targets []map[string]interface{}, callback func(Gridded, Grid, int, int, map[string]map[string]bool)) {
 
 }
 
