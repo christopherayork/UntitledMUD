@@ -30,10 +30,14 @@ func PullField(mapData map[string]interface{}, sect string) []map[string]interfa
 	return result
 }
 
+func CreateTypes(targets []map[string]interface{}, callback func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool)) {
+
+}
+
 func (m MapGenerator) Generate() (*Grid, bool) {
-	Grid := NewGrid()
-	Map, _ := NewMap()
-	Grid.Enter(Map, 1,1) // we'll only have a single map for now, but later abstractions will call for reading the map coords out of the map file
+	NGrid := NewGrid()
+	NMap, _ := NewMap()
+	NGrid.Enter(NMap, 1,1) // we'll only have a single map for now, but later abstractions will call for reading the map coords out of the map file
 	var mapData map[string]interface{}
 	errjs := ReadJSON("map1.json", &mapData)
 	if errjs != nil { fmt.Println(errjs) }
@@ -49,8 +53,16 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	// NewRegion(Map, Grid, 0, 0, regions)
 	// will need to change NewRegion() to support the new map format
 
+	rcb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewRegion(m, g, x, y, coords) }
+	zcb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewZone(m, g, x, y, coords) }
+	acb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewArea(m, g, x, y, coords) }
+	pcb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewPlot(m, g, x, y, coords) }
+	CreateTypes(regions, rcb)
+	CreateTypes(zones, zcb)
+	CreateTypes(areas, acb)
+	CreateTypes(plots, pcb)
 	fmt.Println("Map loaded successfully!")
-	return Grid, true
+	return NGrid, true
 }
 
 // unloads Unmarshal'd JSON into the result pointer (map of interfaces).
