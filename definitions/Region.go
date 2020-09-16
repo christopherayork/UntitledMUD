@@ -12,8 +12,15 @@ type Region struct {
 
 func NewRegion(grid Grid, x, y int, coords ...[][]int) (*Region, error) {
 	region := Region{}
-	if !grid.Enter(region, x, y) { return nil, errors.New("error: NewRegion(), could not enter the region into the grid at that location") }
+	if (x > 0 && y > 0)  && !grid.Enter(region, x, y) { return nil, errors.New("error: NewRegion(), could not enter the region into the grid at that location") }
 	region.grid = &grid // we could set this inside g.Enter(), but we would have to test which type, and map to an interface for all types that match
+	if len(coords) > 0 {
+		for _, set := range coords[0] {
+			if len(set) < 2 { continue } // this is an improper set, and shouldn't be used
+			grid.Enter(region, set[0], set[1])
+			// use every coordinate set in an Enter call for the grid, so it covers all the positions it needs to
+		}
+	}
 	return &region, nil
 }
 

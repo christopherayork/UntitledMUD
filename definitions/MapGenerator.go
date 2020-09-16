@@ -47,14 +47,36 @@ func CreateTypes(targets []map[string]interface{}, g *Grid, callback func(Grid, 
 							}
 						}
 						callback(*g, 0, 0, pvals)
+						// pass in the full array of coordinate sets that it covers on the grid, so the constructor can use them
 					}
 				}
 			}
 		}
 	}
 }
-func CreateTypesTile(targets []map[string]interface{}, g *Grid, callback func(Grid, int, int)) {
-
+func CreateTypesTile(targets []map[string]interface{}, g *Grid, callback func(Grid, int, int, string, string), legend map[string]map[string]string) {
+	for _, v := range targets {
+		if val, ok := v["block"]; ok {
+			if valmap, okvm := val.(map[string]int); okvm {
+				if d, okd := v["desc"]; okd {
+					if key, okkey := d.(string); okkey {
+						if proto, okproto := legend[key]; okproto {
+							if name, okname := proto["Name"]; okname {
+								if desc, okdesc := proto["Description"]; okdesc {
+									if x, okx := valmap["x"]; okx {
+										if y, oky := valmap["y"]; oky {
+											callback(*g, x, y, name, desc)
+											// after verifying all this stuff, we can finally use it to create our tile!
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 func (m MapGenerator) Generate() (*Grid, bool) {
@@ -64,8 +86,8 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	var mapData map[string]interface{}
 	errjs := ReadJSON("map1.json", &mapData)
 	if errjs != nil { fmt.Println(errjs) }
-	var legend map[string]interface{}
-	if lgn, okl := mapData["legend"].(map[string]interface{}); okl { legend = lgn } else {
+	var legend map[string]map[string]string
+	if lgn, okl := mapData["legend"].(map[string]map[string]string); okl { legend = lgn } else {
 		fmt.Println(fmt.Sprintf("%v, %v", lgn, okl))
 		fmt.Println("error: MapGenerator.Generate(), legend failed to load from mapdata")
 	}
@@ -82,12 +104,12 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	zcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewZone(g, x, y, coords) }
 	acb := func(g Grid, x, y int, coords [][]int) { _, _ = NewArea(g, x, y, coords) }
 	pcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewPlot(g, x, y, coords) }
-	tcb := func(g Grid, x, y int) { _, _ = NewTile(g, x, y) }
+	tcb := func(g Grid, x, y int, name, desc string) { _, _ = NewTile(g, x, y, name, desc) }
 	CreateTypes(regions, NGrid, rcb)
 	CreateTypes(zones, NGrid, zcb)
 	CreateTypes(areas, NGrid, acb)
 	CreateTypes(plots, NGrid, pcb)
-	CreateTypesTile(tiles, NGrid, tcb)
+	CreateTypesTile(tiles, NGrid, tcb, legend)
 	fmt.Println("Map loaded successfully!")
 	return NGrid, true
 }

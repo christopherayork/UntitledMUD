@@ -16,11 +16,13 @@ type Tile struct {
 
 // Creates a new Tile{} and returns it if it can successfully Enter() a parent Plot{}.
 // The dirs parameter is optional and takes a map expected to hold *Tile pointers with the options of n, s, e, w for keys.
-func NewTile(grid Grid, x, y int) (*Tile, error) {
+func NewTile(grid Grid, x, y int, name, desc string) (*Tile, error) {
 	tile := Tile{}
 	tile.x = x
 	tile.y = y
 	tile.grid = &grid
+	tile.name = name
+	tile.description = desc
 	return &tile, nil
 }
 
