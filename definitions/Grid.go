@@ -1,8 +1,12 @@
 package definitions
-import "strconv"
+
+import (
+	"fmt"
+	"strconv"
+)
 
 type Grid struct {
-	grid map[string]map[string]map[string]*Tangible
+	grid map[string]map[string]map[string]*Mapped
 }
 
 /*
@@ -64,15 +68,15 @@ func (g Grid) String() string {
 // make a function to link all tangibles
 
 func NewGrid() *Grid {
-	return &Grid{grid: make(map[string]map[string]map[string]*Tangible)}
+	return &Grid{grid: make(map[string]map[string]map[string]*Mapped)}
 }
 
 /* Gets a value out of the Grid's map
-Takes in values such that g.grid["region"]["1"]["1"] returns a *Tangible.
+Takes in values such that g.grid["region"]["1"]["1"] returns a *Mapped.
 Valid call would be g.GetValue("zone", "3", "4").
 If a *Tangible exists within that location, it will be returned
 */
-func (g Grid) GetValue(sect string, x, y int) *Tangible {
+func (g Grid) GetValue(sect string, x, y int) *Mapped {
 	if section, ok := g.grid[sect]; ok {
 		if v, ok := section[strconv.Itoa(x)]; ok {
 			if v2, ok2 := v[strconv.Itoa(y)]; ok2 {
@@ -87,14 +91,14 @@ func (g Grid) GetValue(sect string, x, y int) *Tangible {
 // If it returns an empty string, the target does not map to any valid categories in the grid
 func GetGridCat(target interface{}) string {
 	var key string
-	switch _ := target.(type) {
+	switch v := target.(type) {
 		case Map: key = "map"
 		case Region: key = "region"
 		case Zone: key = "zone"
 		case Area: key = "area"
 		case Plot: key = "plot"
 		case Tile: key = "tile"
-		default: return ""
+		default: fmt.Println(fmt.Sprintf("error: GetGridCat(), cannot operate on type %T", v))
 	}
 	return key
 }
@@ -124,20 +128,23 @@ func (g Grid) Enter(target interface{}, x int, y int, coords ...map[string]map[s
 func (g Grid) Add(target interface{}, x, y string, key string) bool {
 	tmap := g.grid[key]
 	if _, ok := tmap[x]; !ok {
-		tmap[x] = make(map[string]*Tangible)
+		tmap[x] = make(map[string]*Mapped)
 	}
-	if tan, ok2 := target.(Tangible); ok2 {
-		tmap[x][y] = &tan
-		//tan.loc = *g.parent
-		// i need to figure out an easy way for tangibles to be containerized into their parents
-		// now that grids are centralized, it needs manually synced on updates
-		xint, xok := strconv.Atoi(x)
-		yint, yok := strconv.Atoi(y)
-		if xok == nil { tan.x = xint }
-		if yok == nil { tan.y = yint }
-		defer g.Entered(&tan)
-		return true
-	} else { return false }
+	if grd, ok2 := target.(Mapped); ok2 {
+		if tan, ok3 := target.(Tangible); ok3 {
+			tmap[x][y] = &grd
+			xint, xok := strconv.Atoi(x)
+			yint, yok := strconv.Atoi(y)
+			// now that grids are centralized, it needs manually synced on updates
+			// i need to figure out an easy way for tangibles to be containerized into their parents
+			//tan.loc = *g.parent
+			if xok == nil { tan.x = xint }
+			if yok == nil { tan.y = yint }
+			defer g.Entered(&tan)
+			return true
+		}
+	}
+	return false
 }
 
 func (g Grid) Entered(target *Tangible) {

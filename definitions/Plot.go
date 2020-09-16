@@ -41,6 +41,11 @@ func (p Plot) Enter(target Display, x, y int) bool {
 	return false
 }
 
+func (p Plot) GetLocs() [][]int {
+
+	return make([][]int, 0, 1)
+}
+
 func (p Plot) Entered(target Display) {
 	if _, ok := target.(Individual); ok{
 		p.Apply(target)

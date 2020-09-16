@@ -24,6 +24,11 @@ func NewRegion(grid Grid, x, y int, coords ...[][]int) (*Region, error) {
 	return &region, nil
 }
 
+func (r Region) GetLocs() [][]int {
+
+	return make([][]int, 0, 1)
+}
+
 func (r Region) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Zone); ok {
 		defer r.Entered(tan)

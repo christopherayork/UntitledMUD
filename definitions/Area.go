@@ -24,6 +24,11 @@ func NewArea(grid Grid, x, y int, coords ...[][]int) (*Area, error) {
 	return &area, nil
 }
 
+func (a Area) GetLocs() [][]int {
+
+	return make([][]int, 0, 1)
+}
+
 func (a Area) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Plot); ok {
 		defer a.Entered(tan)

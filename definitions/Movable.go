@@ -8,14 +8,16 @@ type Movable struct {
 }
 
 func (m Movable) Move(dir string) bool {
-	var next *Tile
+	worked := false
 	switch dir {
-	case "n": next = m.loc.north
-	case "s": next = m.loc.south
-	case "e": next = m.loc.east
-	case "w": next = m.loc.west
+	case "n": worked = true
+	case "s": worked = true
+	case "e": worked = true
+	case "w": worked = true
 	default: return false
 	}
+	if !worked { return false }
+	next := m.loc.GetDir(dir)
 	if next != nil {
 		canExit := m.loc.Exit(m)
 		if !canExit { return false }

@@ -17,6 +17,9 @@ type Gridded interface {
 	Exit(target Display, x, y int) bool
 	Exited(target Display)
 }
+type Mapped interface {
+	GetLocs() [][]int
+}
 
 type Display interface {
 	String() string

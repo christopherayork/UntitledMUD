@@ -50,18 +50,27 @@ func removeInd(inds []*Individual, ind *Individual) (bool, []*Individual) {
 	return false, inds
 }
 
-func (t Tile) GetDir(dir string) *Tangible {
+func (t Tile) GetDir(dir string) *Tile {
+	var mapval Mapped
 	switch dir {
 		case "north":
-			return t.grid.GetValue("tiles", t.x, t.y + 1)
+			mapval = *t.grid.GetValue("tiles", t.x, t.y + 1)
 		case "south":
-			return t.grid.GetValue("tiles", t.x, t.y - 1)
+			mapval = *t.grid.GetValue("tiles", t.x, t.y - 1)
 		case "east":
-			return t.grid.GetValue("tiles", t.x + 1, t.y)
+			mapval = *t.grid.GetValue("tiles", t.x + 1, t.y)
 		case "west":
-			return t.grid.GetValue("tiles", t.x - 1, t.y)
+			mapval = *t.grid.GetValue("tiles", t.x - 1, t.y)
+	}
+	if mapped, ok := mapval.(Tile); ok {
+		return &mapped
 	}
 	return nil
+}
+
+func (t Tile) GetLocs() [][]int {
+
+	return make([][]int, 0, 1)
 }
 
 // tiles don't need x or y, they are single points on the map

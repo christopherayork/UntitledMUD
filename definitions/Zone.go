@@ -23,6 +23,11 @@ func NewZone(grid Grid, x, y int, coords ...[][]int) (*Zone, error) {
 	return &zone, nil
 }
 
+func (z Zone) GetLocs() [][]int {
+
+	return make([][]int, 0, 1)
+}
+
 func (z Zone) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Area); ok {
 		defer z.Entered(tan)
