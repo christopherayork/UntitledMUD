@@ -2,7 +2,6 @@ package definitions
 
 import (
 	"errors"
-	"fmt"
 )
 
 type Zone struct {
@@ -10,17 +9,10 @@ type Zone struct {
 	grid *Grid
 }
 
-func NewZone(g Gridded, grid Grid, x, y int, coords ...map[string]map[string]bool) (*Zone, error) {
-	_, ok := g.(Region)
-	if !ok {
-		return &Zone{}, errors.New("error: NewZone(), type Zone requires parameter p of type Region")
-	}
+func NewZone(grid Grid, x, y int, coords ...[][]int) (*Zone, error) {
 	zone := Zone{}
 	if !grid.Enter(zone, x, y) { return nil, errors.New("error: NewZone(), could not enter the zone into the grid at that location") }
 	zone.grid = &grid
-	zone.loc = &g
-	oke := g.Enter(zone, x, y)
-	if !oke { fmt.Println("NewZone() failed on Region.Enter()") }
 	return &zone, nil
 }
 

@@ -2,7 +2,6 @@ package definitions
 
 import (
 	"errors"
-	"fmt"
 )
 
 // smallest grid available
@@ -14,16 +13,10 @@ type Plot struct {
 
 // func (t Tangible) Apply(target Display) {}
 
-func NewPlot(g Gridded, grid Grid, x, y int, coords ...map[string]map[string]bool) (*Plot, error) {
-	if _, ok := g.(Area); !ok {
-		return &Plot{}, errors.New("error: NewPlot(), argument for parameter g must be of type Area")
-	}
+func NewPlot(grid Grid, x, y int, coords ...[][]int) (*Plot, error) {
 	plot := Plot{}
 	if !grid.Enter(plot, x, y) { return nil, errors.New("error: NewPlot(), could not enter the plot into the grid at that location") }
 	plot.grid = &grid
-	plot.loc = &g
-	okp := g.Enter(plot, x, y)
-	if !okp { fmt.Println("NewPlot() failed on Area.Enter()") }
 	return &plot, nil
 }
 

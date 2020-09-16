@@ -1,9 +1,5 @@
 package definitions
 
-import (
-	"errors"
-)
-
 /*
 String this together so that when an Individual enters a Tile, if the Tile isn't within the same Plot that the Tile it left was in
 Plot.Enter() gets run on the Individual.
@@ -20,19 +16,12 @@ type Tile struct {
 
 // Creates a new Tile{} and returns it if it can successfully Enter() a parent Plot{}.
 // The dirs parameter is optional and takes a map expected to hold *Tile pointers with the options of n, s, e, w for keys.
-func NewTile(g Gridded, grid Grid, x, y int) (*Tile, error) {
-	if _, ok := g.(Plot); ok {
-		tile := Tile{}
-		// call g.Enter(tile and get permission back before setting tile.loc)
-		if !g.Enter(tile, x, y) { return nil, errors.New("error: NewTile(), parent denied entrance to it's grid") }
-		tile.x = x
-		tile.y = y
-		tile.loc = &g
-		tile.grid = &grid
-		return &tile, nil
-	} else {
-		return nil, errors.New("error: NewTile(), argument for parameter g required to be type Plot")
-	}
+func NewTile(grid Grid, x, y int) (*Tile, error) {
+	tile := Tile{}
+	tile.x = x
+	tile.y = y
+	tile.grid = &grid
+	return &tile, nil
 }
 
 func containsInd(inds []*Individual, ind *Individual) bool {

@@ -2,7 +2,6 @@ package definitions
 
 import (
 	"errors"
-	"fmt"
 )
 
 type Region struct {
@@ -11,16 +10,10 @@ type Region struct {
 	grid *Grid
 }
 
-func NewRegion(m Gridded, grid Grid, x, y int, coords ...map[string]map[string]bool) (*Region, error) {
-	if _, ok := m.(Map); !ok {
-		return &Region{}, errors.New("error: NewRegion(), argument m required to be of type *Map")
-	}
+func NewRegion(grid Grid, x, y int, coords ...[][]int) (*Region, error) {
 	region := Region{}
-	region.loc = &m
 	if !grid.Enter(region, x, y) { return nil, errors.New("error: NewRegion(), could not enter the region into the grid at that location") }
 	region.grid = &grid // we could set this inside g.Enter(), but we would have to test which type, and map to an interface for all types that match
-	ok := m.Enter(region, x, y)
-	if !ok { fmt.Println("error: NewRegion() failed on Map.Enter()") }
 	return &region, nil
 }
 

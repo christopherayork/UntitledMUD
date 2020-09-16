@@ -30,7 +30,30 @@ func PullField(mapData map[string]interface{}, sect string) []map[string]interfa
 	return result
 }
 
-func CreateTypes(targets []map[string]interface{}, callback func(Gridded, Grid, int, int, map[string]map[string]bool)) {
+func CreateTypes(targets []map[string]interface{}, g *Grid, callback func(Grid, int, int, [][]int)) {
+	// Currently reads a block formation from the resulting interface and creates it's instances from that reading
+	// Perhaps a future update could make use of the pairs data, once it's filled out
+
+	for _, v := range targets {
+		if val, ok := v["block"]; ok {
+			if valmap, okvm := val.(map[string][]int); okvm {
+				if xslice, okx := valmap["x"]; okx {
+					if yslice, oky := valmap["y"]; oky {
+						pvals := make([][]int, 1)
+						for x := xslice[0]; x <= xslice[1]; x++ {
+							for y := yslice[0]; y <= yslice[1]; y++ {
+								set := []int {x, y}
+								pvals = append(pvals, set)
+							}
+						}
+						callback(*g, 0, 0, pvals)
+					}
+				}
+			}
+		}
+	}
+}
+func CreateTypesTile(targets []map[string]interface{}, g *Grid, callback func(Grid, int, int)) {
 
 }
 
@@ -50,17 +73,21 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	zones := PullField(mapData, "zones")
 	areas := PullField(mapData, "areas")
 	plots := PullField(mapData, "plots")
+	tiles := PullField(mapData, "tiles")
 	// NewRegion(Map, Grid, 0, 0, regions)
 	// will need to change NewRegion() to support the new map format
-
-	rcb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewRegion(m, g, x, y, coords) }
-	zcb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewZone(m, g, x, y, coords) }
-	acb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewArea(m, g, x, y, coords) }
-	pcb := func(m Gridded, g Grid, x, y int, coords map[string]map[string]bool) { _, _ = NewPlot(m, g, x, y, coords) }
-	CreateTypes(regions, rcb)
-	CreateTypes(zones, zcb)
-	CreateTypes(areas, acb)
-	CreateTypes(plots, pcb)
+	// we need a callback for each, since they return a different type in the same format
+	// we can't tell our CreateTypes() function to accept all of these without changing the return types for each constructor, which we don't want
+	rcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewRegion(g, x, y, coords) }
+	zcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewZone(g, x, y, coords) }
+	acb := func(g Grid, x, y int, coords [][]int) { _, _ = NewArea(g, x, y, coords) }
+	pcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewPlot(g, x, y, coords) }
+	tcb := func(g Grid, x, y int) { _, _ = NewTile(g, x, y) }
+	CreateTypes(regions, NGrid, rcb)
+	CreateTypes(zones, NGrid, zcb)
+	CreateTypes(areas, NGrid, acb)
+	CreateTypes(plots, NGrid, pcb)
+	CreateTypesTile(tiles, NGrid, tcb)
 	fmt.Println("Map loaded successfully!")
 	return NGrid, true
 }
