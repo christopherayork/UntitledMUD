@@ -135,17 +135,13 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	// will need to change NewRegion() to support the new map format
 	// we need a callback for each, since they return a different type in the same format
 	// we can't tell our CreateTypes() function to accept all of these without changing the return types for each constructor, which we don't want
-	fmt.Println("Starting callback definitions")
-	rcb := func(g Grid, x, y int, coords [][]int) {
-
-		inst, err := NewRegion(g, x, y, coords)
-		fmt.Println(inst, err)
-	}
+	rcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewRegion(g, x, y, coords) }
 	zcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewZone(g, x, y, coords) }
 	acb := func(g Grid, x, y int, coords [][]int) { _, _ = NewArea(g, x, y, coords) }
 	pcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewPlot(g, x, y, coords) }
 	tcb := func(g Grid, x, y int, name, desc string) { _, _ = NewTile(g, x, y, name, desc) }
-	fmt.Println("Starting CreateTypes() calls")
+	// figure out why the other types arent loading into the grid properly
+	// region appears to be loading fine
 	CreateTypes(regions, NGrid, rcb)
 	CreateTypes(zones, NGrid, zcb)
 	CreateTypes(areas, NGrid, acb)

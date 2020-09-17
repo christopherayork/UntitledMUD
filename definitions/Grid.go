@@ -7,6 +7,8 @@ import (
 
 type Grid struct {
 	grid map[string]map[string]map[string]*Mapped
+	maxx int
+	maxy int
 }
 
 /*
@@ -61,14 +63,43 @@ type Grid struct {
  */
 
 func (g Grid) String() string {
-	return "Placeholder -> create visual grid from items in grid.map"
+	//return fmt.Sprintf("Grid: %v", g.grid)
+	str := ""
+	str += g.Grid2String(g.grid["region"], "Region")
+	str += g.Grid2String(g.grid["zone"], "Zone")
+	str += g.Grid2String(g.grid["area"], "Area")
+	str += g.Grid2String(g.grid["plot"], "Plot")
+	str += g.Grid2String(g.grid["tile"], "Tile")
+
+	fmt.Println(g.grid["region"], g.grid["zone"], g.grid["area"], g.grid["plot"], g.grid["tile"])
+	return str
+}
+
+func (g Grid) Grid2String(sect map[string]map[string]*Mapped, mtype string) string {
+	str := fmt.Sprintf("%v", mtype)
+	str += "\n\n"
+	for y := g.maxy; y >= 1; y-- { // top to bottom
+		for x := 1; x < g.maxx; x++ { // left to right
+			fmt.Print("running ")
+			if xmap, okxm := sect[strconv.Itoa(x)]; okxm {
+				if _, okyv := xmap[strconv.Itoa(y)]; okyv {
+					str += "[*]"
+				} else {
+					str += "[ ]"
+				}
+			}
+		}
+		str += "\n"
+	}
+	str += "\n"
+	return str
 }
 
 
 // make a function to link all tangibles
 
 func NewGrid() *Grid {
-	return &Grid{grid: make(map[string]map[string]map[string]*Mapped)}
+	return &Grid{grid: make(map[string]map[string]map[string]*Mapped), maxx: 0, maxy: 0}
 }
 
 /* Gets a value out of the Grid's map
@@ -140,6 +171,8 @@ func (g Grid) Add(target interface{}, x, y string, key string) bool {
 		tmap[x][y] = &grd
 		xint, xerr := strconv.Atoi(x)
 		yint, yerr := strconv.Atoi(y)
+		if g.maxx < xint { g.maxx = xint } // make sure these are getting set
+		if g.maxy < yint { g.maxy = yint }
 		// now that grids are centralized, it needs manually synced on updates
 		// i need to figure out an easy way for tangibles to be containerized into their parents
 		//tan.loc = *g.parent
