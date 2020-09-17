@@ -19,6 +19,7 @@ type Gridded interface {
 }
 type Mapped interface {
 	GetLocs() [][]int
+	SetCoords(x, y int)
 }
 
 type Display interface {

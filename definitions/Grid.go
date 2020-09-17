@@ -90,7 +90,7 @@ func (g Grid) GetValue(sect string, x, y int) *Mapped {
 // Generates a key out of a target type for the grid categories.
 // If it returns an empty string, the target does not map to any valid categories in the grid
 func GetGridCat(target interface{}) string {
-	var key string
+	key := ""
 	switch v := target.(type) {
 		case Map: key = "map"
 		case Region: key = "region"
@@ -98,7 +98,7 @@ func GetGridCat(target interface{}) string {
 		case Area: key = "area"
 		case Plot: key = "plot"
 		case Tile: key = "tile"
-		default: fmt.Println(fmt.Sprintf("error: GetGridCat(), cannot operate on type %T", v))
+		default: fmt.Println(fmt.Sprintf("error: GetGridCat(), cannot operate on type %v", v))
 	}
 	return key
 }
@@ -108,6 +108,7 @@ func GetGridCat(target interface{}) string {
 // Takes the format {x: {y: true}}
 func (g Grid) Enter(target interface{}, x int, y int, coords ...map[string]map[string]bool) bool {
 	success := false
+	//return true
 	key := GetGridCat(target)
 	if len(key) == 0 { return false } // we can't enter a non valid type!
 	if x > 0 && y > 0 {
@@ -118,6 +119,7 @@ func (g Grid) Enter(target interface{}, x int, y int, coords ...map[string]map[s
 			for yc, v2 := range v {
 				if v2 {
 					success = g.Add(target, xc, yc, key)
+					fmt.Println("Grid.Enter() coords success")
 				}
 			}
 		}
@@ -126,49 +128,52 @@ func (g Grid) Enter(target interface{}, x int, y int, coords ...map[string]map[s
 }
 
 func (g Grid) Add(target interface{}, x, y string, key string) bool {
+	// return true
+	if _, ok := g.grid[key]; !ok { // make sure the section is added if it doesn't already exist
+		g.grid[key] = make(map[string]map[string]*Mapped)
+	}
 	tmap := g.grid[key]
 	if _, ok := tmap[x]; !ok {
 		tmap[x] = make(map[string]*Mapped)
 	}
 	if grd, ok2 := target.(Mapped); ok2 {
-		if tan, ok3 := target.(Tangible); ok3 {
-			tmap[x][y] = &grd
-			xint, xok := strconv.Atoi(x)
-			yint, yok := strconv.Atoi(y)
-			// now that grids are centralized, it needs manually synced on updates
-			// i need to figure out an easy way for tangibles to be containerized into their parents
-			//tan.loc = *g.parent
-			if xok == nil { tan.x = xint }
-			if yok == nil { tan.y = yint }
-			defer g.Entered(&tan)
-			return true
-		}
+		tmap[x][y] = &grd
+		xint, xerr := strconv.Atoi(x)
+		yint, yerr := strconv.Atoi(y)
+		// now that grids are centralized, it needs manually synced on updates
+		// i need to figure out an easy way for tangibles to be containerized into their parents
+		//tan.loc = *g.parent
+		if xerr == nil && yerr == nil { grd.SetCoords(xint, yint) }
+		defer g.Entered(&grd)
+		return true
 	}
 	return false
 }
 
-func (g Grid) Entered(target *Tangible) {
+func (g Grid) Entered(target interface{}) {
 
 }
 
-func (g Grid) Exit(target *Tangible) bool {
+func (g Grid) Exit(target interface{}) bool {
 	// consider deleting the keys when they're empty, instead of leaving nil entries
 	success := false
 	key := GetGridCat(target)
 	tmap := g.grid[key]
-	if _, ok := tmap[strconv.Itoa(target.x)]; ok {
-		if _, ok2 := tmap[strconv.Itoa(target.x)][strconv.Itoa(target.y)]; ok2 {
-			tmap[strconv.Itoa(target.x)][strconv.Itoa(target.y)] = nil
+	if tan, oktan := target.(Tangible); oktan {
+		if _, ok := tmap[strconv.Itoa(tan.x)]; ok {
+			if _, ok2 := tmap[strconv.Itoa(tan.x)][strconv.Itoa(tan.y)]; ok2 {
+				tmap[strconv.Itoa(tan.x)][strconv.Itoa(tan.y)] = nil
+			}
 		}
+		success = true
+		tan.loc = nil
+		tan.x = 0
+		tan.y = 0
+		defer g.Exited(&tan)
 	}
-	success = true
-	target.loc = nil
-	target.x = 0
-	target.y = 0
-	defer g.Exited(target)
 	return success
 }
 
-func (g Grid) Exited(target *Tangible) {
+func (g Grid) Exited(target interface{}) {
 
 }

@@ -28,6 +28,10 @@ func (a Area) GetLocs() [][]int {
 
 	return make([][]int, 0, 1)
 }
+func (a Area) SetCoords(x, y int) {
+	a.x = x
+	a.y = y
+}
 
 func (a Area) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Plot); ok {

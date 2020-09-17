@@ -45,6 +45,10 @@ func (p Plot) GetLocs() [][]int {
 
 	return make([][]int, 0, 1)
 }
+func (p Plot) SetCoords(x, y int) {
+	p.x = x
+	p.y = y
+}
 
 func (p Plot) Entered(target Display) {
 	if _, ok := target.(Individual); ok{

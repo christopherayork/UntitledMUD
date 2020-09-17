@@ -27,6 +27,10 @@ func (z Zone) GetLocs() [][]int {
 
 	return make([][]int, 0, 1)
 }
+func (z Zone) SetCoords(x, y int) {
+	z.x = x
+	z.y = y
+}
 
 func (z Zone) Enter(target Display, x, y int) bool {
 	if tan, ok := target.(Area); ok {

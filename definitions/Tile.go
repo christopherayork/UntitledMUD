@@ -72,6 +72,10 @@ func (t Tile) GetLocs() [][]int {
 
 	return make([][]int, 0, 1)
 }
+func (t Tile) SetCoords(x, y int) {
+	t.x = x
+	t.y = y
+}
 
 // tiles don't need x or y, they are single points on the map
 // they also will not register as part of the Gridded interface, which is good because they are not Grid holders

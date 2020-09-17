@@ -21,55 +21,87 @@ type MapGenerator struct {
 // change Generate to return a Grid instead of a Map
 
 
-func PullField(mapData map[string]interface{}, sect string) []map[string]interface{} {
-	var result []map[string]interface{}
-	if sec, ok := mapData[sect].([]map[string]interface{}); ok { result = sec } else {
-		fmt.Println(fmt.Sprintf("%v, %v", sec, ok))
-		fmt.Println(fmt.Sprintf("error: MapGenerator.Generate(), %v failed to load from mapdata", sect))
+func PullField(mapData map[string]interface{}, sect string) []interface{} {
+	var result []interface{}
+	if section, oksect := mapData[sect]; oksect {
+		if sec, ok := section.([]interface{}); ok { result = sec } else {
+			fmt.Println(fmt.Sprintf("%v, %v", sec, ok))
+			fmt.Println(fmt.Sprintf("error: MapGenerator.Generate(), %v failed to load from mapdata", sect))
+		}
 	}
 	return result
 }
 
-func CreateTypes(targets []map[string]interface{}, g *Grid, callback func(Grid, int, int, [][]int)) {
+func CreateTypes(targets []interface{}, g *Grid, callback func(Grid, int, int, [][]int)) {
 	// Currently reads a block formation from the resulting interface and creates it's instances from that reading
 	// Perhaps a future update could make use of the pairs data, once it's filled out
 
-	for _, v := range targets {
-		if val, ok := v["block"]; ok {
-			if valmap, okvm := val.(map[string][]int); okvm {
-				if xslice, okx := valmap["x"]; okx {
-					if yslice, oky := valmap["y"]; oky {
-						pvals := make([][]int, 1)
-						for x := xslice[0]; x <= xslice[1]; x++ {
-							for y := yslice[0]; y <= yslice[1]; y++ {
-								set := []int {x, y}
-								pvals = append(pvals, set)
+	for _, target := range targets {
+		if v, okv := target.(map[string]interface{}); okv {
+			if val, ok := v["block"]; ok {
+				if valmap, okvm := val.(map[string]interface{}); okvm {
+					//fmt.Println("Reached line 43")
+					if xsliceint, okx := valmap["x"]; okx {
+						if ysliceint, oky := valmap["y"]; oky {
+							if xslice, okxs := xsliceint.([]interface{}); okxs {
+								if yslice, okys := ysliceint.([]interface{}); okys {
+									if xlower, xlowok := xslice[0].(float64); xlowok {
+										if xupper, xupok := xslice[1].(float64); xupok {
+											if ylower, ylowok := yslice[0].(float64); ylowok {
+												if yupper, yupok := yslice[1].(float64); yupok {
+													//return
+													pvals := make([][]int, 0)
+													for x := int(xlower); x <= int(xupper); x++ {
+														for y := int(ylower); y <= int(yupper); y++ {
+															set := []int {int(x), int(y)}
+															pvals = append(pvals, set)
+														}
+													}
+													callback(*g, 0, 0, pvals)
+													// pass in the full array of coordinate sets that it covers on the grid, so the constructor can use them
+												}
+											}
+										}
+									}
+								}
 							}
 						}
-						callback(*g, 0, 0, pvals)
-						// pass in the full array of coordinate sets that it covers on the grid, so the constructor can use them
 					}
 				}
 			}
 		}
 	}
 }
-func CreateTypesTile(targets []map[string]interface{}, g *Grid, callback func(Grid, int, int, string, string), legend map[string]map[string]string) {
-	for _, v := range targets {
-		if val, ok := v["block"]; ok {
-			if valmap, okvm := val.(map[string]int); okvm {
-				if d, okd := v["desc"]; okd {
-					if key, okkey := d.(string); okkey {
-						if proto, okproto := legend[key]; okproto {
-							if name, okname := proto["Name"]; okname {
-								if desc, okdesc := proto["Description"]; okdesc {
-									if x, okx := valmap["x"]; okx {
-										if y, oky := valmap["y"]; oky {
-											callback(*g, x, y, name, desc)
-											// after verifying all this stuff, we can finally use it to create our tile!
+func CreateTypesTile(targets []interface{}, g *Grid, callback func(Grid, int, int, string, string), legend map[string]interface{}) {
+	for _, target := range targets {
+		if v, okv := target.(map[string]interface{}); okv {
+			if val, ok := v["block"]; ok {
+				if valmap, okvm := val.(map[string]interface{}); okvm {
+					if d, okd := v["desc"]; okd {
+						if key, okkey := d.(string); okkey {
+							if expanded, okexpanded := legend[key]; okexpanded {
+								if proto, okproto := expanded.(map[string]interface{}); okproto {
+									if nameint, okname := proto["Name"]; okname {
+										if descint, okdesc := proto["Description"]; okdesc {
+											if xinterface, okx := valmap["x"]; okx {
+												if x, okx2 := xinterface.(float64); okx2 {
+													if yinterface, oky := valmap["y"]; oky {
+														if y, oky2 := yinterface.(float64); oky2 {
+															if name, okname2 := nameint.(string); okname2 {
+																if desc, okdesc2 := descint.(string); okdesc2 {
+																	callback(*g, int(x), int(y), name, desc)
+																	// after verifying all this stuff, we can finally use it to create our tile!
+																}
+															}
+														}
+													}
+												}
+											}
 										}
 									}
 								}
+							} else {
+								fmt.Println(fmt.Sprintf("Failed to load legend[key](legend[%v])", key))
 							}
 						}
 					}
@@ -86,10 +118,13 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	var mapData map[string]interface{}
 	errjs := ReadJSON("map1.json", &mapData)
 	if errjs != nil { fmt.Println(errjs) }
-	var legend map[string]map[string]string
-	if lgn, okl := mapData["legend"].(map[string]map[string]string); okl { legend = lgn } else {
-		fmt.Println(fmt.Sprintf("%v, %v", lgn, okl))
-		fmt.Println("error: MapGenerator.Generate(), legend failed to load from mapdata")
+	//fmt.Println(mapData)
+	var legend map[string]interface{}
+	if leg, okleg := mapData["legend"]; okleg {
+		if lgn, okl := leg.(map[string]interface{}); okl { legend = lgn } else {
+			fmt.Println(fmt.Sprintf("%v, %v", lgn, okl))
+			fmt.Println("error: MapGenerator.Generate(), legend failed to load from mapdata")
+		}
 	}
 	regions := PullField(mapData, "regions")
 	zones := PullField(mapData, "zones")
@@ -100,11 +135,17 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	// will need to change NewRegion() to support the new map format
 	// we need a callback for each, since they return a different type in the same format
 	// we can't tell our CreateTypes() function to accept all of these without changing the return types for each constructor, which we don't want
-	rcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewRegion(g, x, y, coords) }
+	fmt.Println("Starting callback definitions")
+	rcb := func(g Grid, x, y int, coords [][]int) {
+
+		inst, err := NewRegion(g, x, y, coords)
+		fmt.Println(inst, err)
+	}
 	zcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewZone(g, x, y, coords) }
 	acb := func(g Grid, x, y int, coords [][]int) { _, _ = NewArea(g, x, y, coords) }
 	pcb := func(g Grid, x, y int, coords [][]int) { _, _ = NewPlot(g, x, y, coords) }
 	tcb := func(g Grid, x, y int, name, desc string) { _, _ = NewTile(g, x, y, name, desc) }
+	fmt.Println("Starting CreateTypes() calls")
 	CreateTypes(regions, NGrid, rcb)
 	CreateTypes(zones, NGrid, zcb)
 	CreateTypes(areas, NGrid, acb)
