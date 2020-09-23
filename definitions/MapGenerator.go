@@ -20,7 +20,7 @@ type MapGenerator struct {
 func (m MapGenerator) Generate() (*Grid, bool) {
 	NGrid := NewGrid()
 	NMap, _ := NewMap()
-	NGrid.Enter(NMap, 1,1) // we'll only have a single map for now, but later abstractions will call for reading the map coords out of the map file
+	NGrid.Enter(*NMap, 1,1) // we'll only have a single map for now, but later abstractions will call for reading the map coords out of the map file
 	mapData := Mapfile{}
 	errjs := ReadMapJSON("map1.json", &mapData)
 	if errjs != nil { fmt.Println(errjs) }
@@ -30,12 +30,18 @@ func (m MapGenerator) Generate() (*Grid, bool) {
 	acb := func(x, y int, coords [][]int) { _, _ = NewArea(*NGrid, x, y, coords) }
 	pcb := func(x, y int, coords [][]int) { _, _ = NewPlot(*NGrid, x, y, coords) }
 	tcb := func(x, y int, name, desc string) { _, _ = NewTile(*NGrid, x, y, name, desc) }
+	fmt.Println("Making regions")
 	mapData.Regions.MakeGroup(rcb)
+	fmt.Println("Making zones")
 	mapData.Zones.MakeGroup(zcb)
+	fmt.Println("Making areas")
 	mapData.Areas.MakeGroup(acb)
+	fmt.Println("Making plots")
 	mapData.Plots.MakeGroup(pcb)
+	fmt.Println("Making tiles")
 	mapData.Tiles.MakeGroup(tcb, mapData.Legend)
 	fmt.Println("Map loaded successfully!")
+	fmt.Println(mapData)
 	return NGrid, true
 }
 
@@ -90,6 +96,7 @@ type GridConstructor func(int, int, [][]int)
 // Takes in a *Grid and callback which calls a type constructor.
 // This supplies all the given data for a multi-coordinate Gridded type to be made and expanded over all locations
 func (group MapSectionGridGroup) MakeGroup(callback GridConstructor) bool {
+	fmt.Println(group)
 	for _, grid := range group {
 		pvals := grid.GetPairs()
 		callback(0, 0, pvals)
@@ -104,6 +111,7 @@ type MapSectionGrid struct {
 }
 
 func (grid MapSectionGrid) GetPairs() [][]int {
+	fmt.Println(grid.Block)
 	xlower, xupper := grid.Block.SplitX()
 	ylower, yupper := grid.Block.SplitY()
 	pvals := make([][]int, 0, (xupper-xlower)*(yupper-ylower)) // save on reallocations
@@ -159,4 +167,58 @@ type Mapfile struct {
 	Areas MapSectionGridGroup `json:"areas"`
 	Plots MapSectionGridGroup `json:"plots"`
 	Tiles MapSectionTileGroup `json:"tiles"`
+}
+
+func (mf Mapfile) String() string {
+	output := "Mapfile {\n"
+	output += "    Legend {\n"
+	for key, val := range mf.Legend {
+		output += fmt.Sprintf("        %v: {\n", key)
+		output += fmt.Sprintf("            Name: %v\n", val.Name)
+		output += fmt.Sprintf("            Description: %v\n", val.Description)
+		output += "        }\n"
+	}
+	output += "    }\n"
+	msggStringer := func(msgg MapSectionGridGroup, name string) string {
+		oVal := fmt.Sprintf("    %v: [\n", name)
+		for i, v := range msgg {
+			oVal += fmt.Sprintf("        %v: {\n", i)
+			oVal += "            Pairs: [\n"
+			oVal += "                " // add the space for the first row
+			for pairIndex, pairVal := range v.Pairs {
+				oVal += fmt.Sprintf("[ %v, %v ] ", pairVal[0], pairVal[1])
+				if pairIndex % 4 == 0 {
+					oVal += "\n                "
+				}
+			}
+			oVal += "            \n]\n" // close the pairs bracket
+			oVal += "            Block: {\n"
+			X1, X2 := v.Block.SplitX()
+			Y1, Y2 := v.Block.SplitY()
+			oVal += fmt.Sprintf("                X: [ %v, %v ]\n", X1, X2)
+			oVal += fmt.Sprintf("                Y: [ %v, %v ]", Y1, Y2)
+			oVal += "            }\n" // close the block brace
+			oVal += "        }\n" // close the loop opened brace
+		}
+		oVal += "    ]\n"
+		return oVal
+	}
+	output += msggStringer(mf.Regions, "Regions")
+	output += msggStringer(mf.Zones, "Zones")
+	output += msggStringer(mf.Zones, "Areas")
+	output += msggStringer(mf.Zones, "Plots")
+	mstgStringer := func(mstg MapSectionTileGroup) string {
+		oVal := "    Tiles: [\n"
+		for tIndex, tVal := range mstg {
+			oVal += fmt.Sprintf("        %v: {\n", tIndex)
+			oVal += fmt.Sprintf("            Block: { X: %v, Y: %v }\n", tVal.Block.X, tVal.Block.Y)
+			oVal += fmt.Sprintf("            Desc: %v\n", tVal.Desc)
+			oVal += "        }\n"
+		}
+		oVal += "    ]\n"
+		return oVal
+	}
+	output += mstgStringer(mf.Tiles)
+	output += "}" // all done!
+	return output
 }

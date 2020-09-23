@@ -137,21 +137,20 @@ func GetGridCat(target interface{}) string {
 // To pass a single item into the grid, supply an x and y.
 // To pass multiple items into the grid, supply a map[string]map[string]string as an arg at the end
 // Takes the format {x: {y: true}}
-func (g Grid) Enter(target interface{}, x int, y int, coords ...map[string]map[string]bool) bool {
+func (g Grid) Enter(target interface{}, x int, y int, coords ...[][]int) bool {
 	success := false
 	//return true
 	key := GetGridCat(target)
-	if len(key) == 0 { return false } // we can't enter a non valid type!
+	//fmt.Println(fmt.Sprintf("Target: %T %v, key: %v", target, target, key))
+	//fmt.Println(fmt.Sprintf("Vals: (x: %v, y:%v)[coords:%v]", x, y, coords))
+	if key == "" { return false } // we can't enter a non valid type!
 	if x > 0 && y > 0 {
 		success = g.Add(target, strconv.Itoa(x), strconv.Itoa(y), key)
 	} else if len(coords) > 0 {
 		mappings := coords[0]
-		for xc, v := range mappings {
-			for yc, v2 := range v {
-				if v2 {
-					success = g.Add(target, xc, yc, key)
-					fmt.Println("Grid.Enter() coords success")
-				}
+		for _, set := range mappings {
+			if len(set) > 1 {
+				success = g.Add(target, strconv.Itoa(set[0]), strconv.Itoa(set[1]), key)
 			}
 		}
 	}
